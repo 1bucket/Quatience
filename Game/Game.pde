@@ -25,19 +25,17 @@ void setup() {
   PVector start = new PVector(0, elev);
   PVector end = start.copy().set(start.x + tileWidth, elev);
   while (end.x <= width) {
-    terrain.add(new LandTile(start, end, false));
+    terrain.add(new LandTile(start, end, true, color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
     start = new PVector(end.x, elev);
     end = start.copy().set(start.x + tileWidth, elev);
   }
   //for (LandTile tile : terrain) {
   //  System.out.println(tile);
   //}
-  drawTerrain();
   
   float leftSide = terrain.get(4).start.x;
   //float rightSide = leftSide + tileWidth;
   p = new Player(new PVector(leftSide * 1.5, elev - tileWidth / 2));
-  drawPlayer();
   stroke(0, 0, 0);
 }
 
@@ -58,18 +56,15 @@ void drawPlayer() {
 
 void drawTerrain() {
   for (LandTile tile : terrain) {
-    stroke((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
-    //what += 30;
+    //stroke((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+    stroke(tile.col);
     line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
     if (tile.hasObstacle){
-      fill(0, 0, 0);
-      Obstacle obs = tile.obs;
-      triangle(obs.pos.x - obsW / 2,
-               obs.pos.y,
-               obs.pos.x + obsW / 2,
-               obs.pos.y,
-               obs.pos.x,
-               obs.pos.y - obsH);
+      fill(tile.col);
+      //Obstacle obs = tile.obs;
+      triangle(tile.start.x, tile.start.y,
+               tile.start.x - tileWidth, tile.start.y,
+               tile.start.x - tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
     }
   }
   stroke(200, 150, 200);
@@ -87,14 +82,19 @@ void movePlayer() {
     
     // shift terrain left to produce illusion of character movement
     for (LandTile tile : terrain) {
-      tile.shift(100 - p.getSpdX());
+      tile.shift(2);
     }
+    //LandTile og = terrain.get(20);
+    //System.out.println(og.diff);
     
     // continuously generate new terrain as the game runs
     if (terrain.get(0).end.x < 0) terrain.remove(0);
     LandTile lastTile = terrain.get(terrain.size() - 1);
-    if (terrain.size() < 45) 
-      terrain.add(new LandTile(lastTile.end, lastTile.end.copy().set(lastTile.end.x + tileWidth, lastTile.end.y), false));
+    if (terrain.size() < 45) {
+        boolean willHaveObs = Math.random() < 0.3 ? true : false;
+        terrain.add(new LandTile(lastTile.end, lastTile.end.copy().set(lastTile.end.x + tileWidth, lastTile.end.y), willHaveObs, 
+                  color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
+    }
     
     
   // ensure player does not go below ground
@@ -103,7 +103,6 @@ void movePlayer() {
 
   LandTile closest = tileBelow(pCenter);
   Line surface = new Line(closest.start, closest.end);
-  //System.out.println(surface.distToLine(pCenter));
   if (surface.distToLine(pCenter) > tileWidth / 2) {
     gravity();
     p.setRotAng(p.getRotAng() + PI / 36);
@@ -118,7 +117,6 @@ void movePlayer() {
   else if (numGrounded == 1) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
-    //System.out.println("bruh");
   }
 }
 
