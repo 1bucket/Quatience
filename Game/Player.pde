@@ -1,14 +1,15 @@
-class Player {
+class Player { //<>//
   //private PVector[] corners;
   private PVector center;
   private int speedx;
   private int speedy;
   private float rotAng;
   
+  
   public Player(PVector center) {
     this.center = center;
     rotAng = PI / 4;
-    speedx = 1000;
+    speedx = 95;
     speedy = 0;
   }
   

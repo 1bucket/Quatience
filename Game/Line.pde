@@ -47,4 +47,9 @@ class Line {
     float denom = (float) Math.sqrt(Math.pow(slope, 2) + 1);
     return nume / denom;
   }
+  
+  // checks if given PVector is (visually) below or on the graph of this line 
+  public boolean isBelowLine(PVector pt) {
+    return output(pt.x) - pt.y <= 0;
+  }
 }
