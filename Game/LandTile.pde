@@ -13,6 +13,11 @@ class LandTile {
                                                     (start.y + start.y) / 2));
   }
   
+  public void shift(int xShift) {
+    start.add(-xShift, 0);
+    end.add(-xShift, 0);
+  }
+  
   public String toString() {
     return "Start: " + start.x + ", " + start.y + "\n" +
            "End: " + end.x + ", " + end.y + "\n";
