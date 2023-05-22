@@ -10,7 +10,6 @@ int exploSize;
 int opacity;
 
 ArrayList<LandTile> terrain;
-ArrayList<Obstacle> obstacles;
 LandTile startTile;
 
 void setup() {
@@ -28,27 +27,11 @@ void setup() {
   opacity = 256;
   exploSize = (int) (tileWidth * sqrt(2));
   
-  
-  obsH = (float) (Math.sqrt(3) * tileWidth / 2);
-  obsW = tileWidth;
-  
   terrain = new ArrayList<LandTile>();
-  //PVector start = new PVector(0, elev);
-  //PVector end = start.copy().set(start.x + tileWidth, elev);
-  //while (end.x <= width) {
-  //  terrain.add(new LandTile(start, end, true, color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
-  //  start = new PVector(end.x, elev);
-  //  end = start.copy().set(start.x + tileWidth, elev);
-  //}
-  startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false);
+  startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
   terrain.add(startTile);
-  //for (LandTile tile : terrain) {
-  //  System.out.println(tile);
-  //}
-  
-  //float leftSide = terrain.get(4).start.x;
-  //float rightSide = leftSide + tileWidth;
-  p = new Player(new PVector(120 * 1.5, elev - tileWidth / 2));
+
+  p = new Player(new PVector(180, elev - tileWidth / 2));
   stroke(0, 0, 0);
 }
 
@@ -94,8 +77,17 @@ void drawTerrain() {
   stroke(200, 150, 200);
 }
 
+void displayScore() {
+  fill(255, 255, 255);
+  textSize(40);
+  textAlign(CENTER);
+  text(score, width / 2, 40);
+}
+
 void draw() {
   background(0, 0, 0);
+  if (! gameOver) score += 5;
+  displayScore();
   drawTerrain();
   drawPlayer();
   movePlayer();
