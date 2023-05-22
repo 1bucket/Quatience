@@ -1,4 +1,4 @@
-class Player { //<>//
+class Player { //<>// //<>//
   //private PVector[] corners;
   private PVector center;
   private int speedx;
@@ -6,10 +6,10 @@ class Player { //<>//
   private float rotAng;
   
   
-  public Player(PVector center) {
+  public Player(PVector center, int spdX) {
     this.center = center;
     rotAng = PI / 4;
-    speedx = 2;
+    speedx = spdX;
     speedy = 0;
   }
   
@@ -63,7 +63,7 @@ class Player { //<>//
   public void jump() {
     speedy = 20;
     System.out.println("jump!");
-  } //<>//
+  } //<>// //<>//
   
   
 }

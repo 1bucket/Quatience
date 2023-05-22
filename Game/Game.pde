@@ -2,10 +2,11 @@ boolean pause;
 int score = 0;
 int elev;
 boolean gameOver;
+ArrayList<Button> buttons;
 
 Player p;
 color pCol;
-int minSpd;
+int curSpd;
 int exploSize;
 int opacity;
 
@@ -16,7 +17,7 @@ void setup() {
   size(1200, 600);
   
   
-  minSpd = 100;
+  curSpd = 2;
   tileWidth = width / 40;
   elev = height * 2 / 3;
   pause = false;
@@ -31,8 +32,12 @@ void setup() {
   startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
   terrain.add(startTile);
 
-  p = new Player(new PVector(180, elev - tileWidth / 2));
+  p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   stroke(0, 0, 0);
+  
+  buttons = new ArrayList<Button>();
+  //Button b = new Button(new PVector(width / 2, height / 2), "whoa", 75, 50);
+  //buttons.add(b); 
 }
 
 void drawPlayer() {
@@ -84,13 +89,33 @@ void displayScore() {
   text(score, width / 2, 40);
 }
 
+void displayAllButtons() {
+  for (Button button : buttons) button.displayButton();
+}
+
+void activateButton() {
+  for (Button button : buttons) 
+    if (mousePressed & button.isMouseOnButton()) {
+      if (button.getText().equals("Resume")) pause = true;
+      else if (button.getText().equals("Restart")) {
+        endGame();
+        setup();
+      }
+    }
+}
+
 void draw() {
   background(0, 0, 0);
-  if (! gameOver) score += 5;
+  if (! gameOver && ! pause) {
+    score += 5;
+    movePlayer();
+  }
   displayScore();
   drawTerrain();
   drawPlayer();
-  movePlayer();
+  displayAllButtons();
+  if (pause) pauseGame();
+  else p.setSpdX(curSpd);
 }
 
 
@@ -193,11 +218,22 @@ void endGame() {
   System.out.println("bonk");
 }
 
+void pauseGame() {
+  // freeze game
+  p.setSpdX(0);
+  
+  // build pause menu
+  //Button resume = new Button(;
+  Button restart;
+  System.out.println("paused");
+}
+
 void keyPressed() {
-  if (key == ' ' && cornersOnGround().size() == 2 && ! gameOver) p.jump();
+  if (key == ' ' && cornersOnGround().size() == 2 && ! gameOver && ! pause) p.jump();
   if (gameOver && key == 'a') {
     setup();
     gameOver = false;
   }
+  if (keyCode == ESC) pause = !pause;
 }
   
