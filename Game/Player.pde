@@ -9,7 +9,7 @@ class Player { //<>//
   public Player(PVector center) {
     this.center = center;
     rotAng = PI / 4;
-    speedx = 95;
+    speedx = 2;
     speedy = 0;
   }
   
