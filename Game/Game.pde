@@ -94,14 +94,19 @@ void displayAllButtons() {
 }
 
 void activateButton() {
-  for (Button button : buttons) 
+  for (Button button : buttons)  {
+    //System.out.println(button.isMouseOnButton());
     if (mousePressed & button.isMouseOnButton()) {
-      if (button.getText().equals("Resume")) pause = true;
+      System.out.println(button.getText());
+      if (button.getText().equals("Resume")) 
+        pause = false;
+        
       else if (button.getText().equals("Restart")) {
         endGame();
         setup();
       }
     }
+  }
 }
 
 void draw() {
@@ -114,6 +119,7 @@ void draw() {
   drawTerrain();
   drawPlayer();
   displayAllButtons();
+  activateButton();
   if (pause) pauseGame();
   else p.setSpdX(curSpd);
 }
@@ -223,9 +229,15 @@ void pauseGame() {
   p.setSpdX(0);
   
   // build pause menu
-  //Button resume = new Button(;
-  Button restart;
-  System.out.println("paused");
+  int bWidth = 120;
+  int bHeight = 75;
+  PVector midpt = new PVector(width / 2, height * .75);
+  Button resume = new Button(midpt.copy().add(-150, 0), "Resume", bWidth, bHeight);
+  //resume.displayButton();
+  Button restart = new Button(midpt.copy().add(150, 0), "Restart", bWidth, bHeight);
+  buttons.add(resume);
+  buttons.add(restart);
+  //System.out.println("paused");
 }
 
 void keyPressed() {
@@ -234,6 +246,9 @@ void keyPressed() {
     setup();
     gameOver = false;
   }
-  if (keyCode == ESC) pause = !pause;
+  if (key == 'p') {
+    //if (pause) buttons = new ArrayList<Button>();
+    pause = !pause;
+  }
 }
   
