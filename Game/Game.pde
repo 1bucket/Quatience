@@ -1,4 +1,8 @@
 boolean pause;
+int difficulty;
+final int EASY = 0;
+final int MEDIUM = 1;
+final int HARD = 2;
 int score = 0;
 int elev;
 boolean gameOver;
@@ -23,7 +27,7 @@ void newGame() {
   pause = false;
   score = 0;
   
-  curSpd = 2;
+  curSpd = 4;
   tileWidth = width / 40;
   elev = height * 2 / 3;
   pause = false;
@@ -37,6 +41,13 @@ void newGame() {
   terrain = new ArrayList<LandTile>();
   startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
   terrain.add(startTile);
+  
+  PVector testBegin = startTile.end.copy().add(0, -50);
+  PVector testEnd = testBegin.copy().add(tileWidth, 0);
+  //System.out.println(testBegin);
+  //System.out.println(testEnd);
+  LandTile testTile = new LandTile(testBegin, testEnd, false, color(255, 0, 0));
+  terrain.add(testTile);
 
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
@@ -67,22 +78,42 @@ void drawPlayer() {
 
 
 void drawTerrain() {
-  for (LandTile tile : terrain) {
-    //stroke((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+  //for (LandTile tile : terrain) {
+  //  stroke(tile.col);
+  //  line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
+  //  if (tile.hasObstacle){
+  //    fill(tile.col);
+  //    PVector obsApex = tile.getObsApex();
+  //    triangle(tile.start.x, tile.start.y,
+  //             tile.start.x + tileWidth, tile.start.y,
+  //             //tile.start.x + tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
+  //             obsApex.x, obsApex.y);
+  //  }
+  //}
+  
+  // modified loop to incorporate changes in elevation
+  for (int index = 0; index < terrain.size(); index++) {
+    LandTile tile = terrain.get(index);
     stroke(tile.col);
     line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
     if (tile.hasObstacle){
       fill(tile.col);
-      //Obstacle obs = tile.obs;
       PVector obsApex = tile.getObsApex();
       triangle(tile.start.x, tile.start.y,
                tile.start.x + tileWidth, tile.start.y,
                //tile.start.x + tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
                obsApex.x, obsApex.y);
     }
+    int nextInd = index + 1;
+    if (nextInd < terrain.size()) {
+      LandTile next = terrain.get(nextInd);
+      if (next.start.y != tile.end.y) {
+        line(tile.end.x, tile.end.y, next.start.x, next.start.y);
+      }
+    }
   }
   // for indicating end of start tile
-  line(startTile.end.x, elev, startTile.end.x, 0);
+  //line(startTile.end.x, elev, startTile.end.x, 0);
   stroke(200, 150, 200);
 }
 
@@ -111,7 +142,7 @@ void activateButton() {
 }
 
 void draw() {
-  background(0, 0, 0);
+  background(255, 222, 131);
   if (! gameOver && ! pause) {
     score += 5;
     movePlayer();
@@ -121,8 +152,14 @@ void draw() {
   drawPlayer();
   displayAllButtons();
   activateButton();
+  PVector c = p.getCenter();
+  //System.out.println(c);
+  //System.out.println(tileBelow(c).start.y);
+  //System.out.println(terrain.get(1).start);
+  //System.out.println(terrain.get(1).end);
   if (pause) pauseGame();
   else p.setSpdX(curSpd);
+  System.out.println(cornersOnGround().size());
 }
 
 
@@ -136,7 +173,7 @@ void movePlayer() {
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.3 ? true : false;
-      terrain.add(new LandTile(lastTile.end, lastTile.end.copy().set(lastTile.end.x + tileWidth, lastTile.end.y), willHaveObs, 
+      terrain.add(new LandTile(lastTile.end.copy(), lastTile.end.copy().set(lastTile.end.x + tileWidth, lastTile.end.y), willHaveObs, 
                 color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
   }
   
@@ -177,7 +214,9 @@ void checkCollision() {
     p.setSpdY(0);
   }
   
+  
   // collision against walls (horizontal collision)
+  
 }
 
 void gravity() {
