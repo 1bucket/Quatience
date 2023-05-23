@@ -15,7 +15,13 @@ LandTile startTile;
 
 void setup() {
   size(1200, 600);
-  
+  newGame(); 
+}
+
+void newGame() {
+  gameOver = false;
+  pause = false;
+  score = 0;
   
   curSpd = 2;
   tileWidth = width / 40;
@@ -33,11 +39,9 @@ void setup() {
   terrain.add(startTile);
 
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
-  stroke(0, 0, 0);
+  //stroke(0, 0, 0);
   
   buttons = new ArrayList<Button>();
-  //Button b = new Button(new PVector(width / 2, height / 2), "whoa", 75, 50);
-  //buttons.add(b); 
 }
 
 void drawPlayer() {
@@ -97,13 +101,10 @@ void activateButton() {
   for (Button button : buttons)  {
     //System.out.println(button.isMouseOnButton());
     if (mousePressed & button.isMouseOnButton()) {
-      System.out.println(button.getText());
       if (button.getText().equals("Resume")) 
-        pause = false;
-        
+        resumeGame();
       else if (button.getText().equals("Restart")) {
-        endGame();
-        setup();
+        newGame();
       }
     }
   }
@@ -225,6 +226,7 @@ void endGame() {
 }
 
 void pauseGame() {
+  pause = true;
   // freeze game
   p.setSpdX(0);
   
@@ -240,15 +242,19 @@ void pauseGame() {
   //System.out.println("paused");
 }
 
+void resumeGame() {
+  pause = false;
+  buttons = new ArrayList<Button>();
+}
+
 void keyPressed() {
   if (key == ' ' && cornersOnGround().size() == 2 && ! gameOver && ! pause) p.jump();
   if (gameOver && key == 'a') {
-    setup();
-    gameOver = false;
+    newGame();
   }
   if (key == 'p') {
-    //if (pause) buttons = new ArrayList<Button>();
-    pause = !pause;
+    if (pause) resumeGame();
+    else pauseGame();
   }
 }
   
