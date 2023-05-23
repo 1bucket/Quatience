@@ -27,7 +27,7 @@ void newGame() {
   pause = false;
   score = 0;
   
-  curSpd = 4;
+  curSpd = 10;
   tileWidth = width / 40;
   elev = height * 2 / 3;
   pause = false;
@@ -42,7 +42,7 @@ void newGame() {
   startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
   terrain.add(startTile);
   
-  PVector testBegin = startTile.end.copy().add(0, -50);
+  PVector testBegin = startTile.end.copy().add(0, -40);
   PVector testEnd = testBegin.copy().add(tileWidth, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
@@ -152,14 +152,10 @@ void draw() {
   drawPlayer();
   displayAllButtons();
   activateButton();
-  PVector c = p.getCenter();
-  //System.out.println(c);
-  //System.out.println(tileBelow(c).start.y);
-  //System.out.println(terrain.get(1).start);
-  //System.out.println(terrain.get(1).end);
+  
   if (pause) pauseGame();
   else p.setSpdX(curSpd);
-  System.out.println(cornersOnGround().size());
+  
 }
 
 
@@ -169,7 +165,9 @@ void movePlayer() {
   for (LandTile tile : terrain) tile.shift(p.getSpdX());
   
   // continuously generate new terrain as the game runs
-  if (terrain.get(0).end.x < 0) terrain.remove(0);
+  //if (terrain.get(0).end.x < 0) terrain.remove(0);
+  LandTile curTile = terrain.get(0);
+  if (curTile.end.x < 0) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.3 ? true : false;
@@ -180,13 +178,6 @@ void movePlayer() {
   // vertical player movement
   PVector pCenter = p.getCenter();
   pCenter.add(0, - p.getSpdY());
-
-  LandTile closest = tileBelow(pCenter);
-  Line surface = new Line(closest.start, closest.end);
-  if (surface.distToLine(pCenter) > tileWidth / 2) {
-    gravity();
-    p.setRotAng(p.getRotAng() + PI / 36);
-  }
   checkCollision();
 }
 
@@ -205,15 +196,19 @@ void checkCollision() {
   }
   
   // collision against the ground (vertical collision)
-  ArrayList<PVector> groundedCorners = cornersOnGround();
-  int numGrounded = groundedCorners.size();
-  //if (numGrounded == 1) System.out.println(numGrounded);
-  if (numGrounded == 2) p.setRotAng(PI/4);
-  else if (numGrounded == 1) {
+  int grounded = 0;
+  for (PVector corner : corners) {
+    LandTile underTile = tileBelow(corner);
+    if (corner.y >= underTile.start.y - 5) grounded++; 
+  }
+  if (grounded >= 1) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
   }
-  
+  else {
+    gravity();
+    p.setRotAng(p.getRotAng() + PI / 36);
+  }
   
   // collision against walls (horizontal collision)
   
@@ -231,29 +226,13 @@ LandTile tileBelow(PVector corner) {
   return null;
 }
 
-LandTile closestTile(PVector pt) {
-  float smallestDist = Integer.MAX_VALUE;
-  LandTile closestTile = null;
-  for (LandTile tile : terrain) {
-    float midX = (tile.start.x + tile.end.x) / 2;
-    float midY = (tile.start.y + tile.end.y) / 2;
-    PVector midpt = new PVector(midX, midY);
-    float dist = pt.dist(midpt);
-    if (dist < smallestDist) {
-      smallestDist = dist;
-      closestTile = tile;
-    }
-    else break;
-  }
-  return closestTile;
-}
-
 ArrayList<PVector> cornersOnGround() {
   ArrayList<PVector> grounded = new ArrayList<PVector>();
   for (PVector corner : p.getCorners()) {
-    LandTile closTile = tileBelow(corner);
-    Line surface = new Line(closTile.start, closTile.end);
-    if (surface.output(corner.x) - corner.y <= 0) grounded.add(corner);
+    LandTile underTile = tileBelow(corner);
+    //Line surface = new Line(underTile.start, underTile.end);
+    //if (surface.output(corner.x) - corner.y <= 0) grounded.add(corner);
+    if (corner.y >= underTile.start.y - 1) grounded.add(corner);
   }
   return grounded;
 }
