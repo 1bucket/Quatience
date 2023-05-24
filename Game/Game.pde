@@ -15,6 +15,7 @@ int exploSize;
 int opacity;
 
 ArrayList<LandTile> terrain;
+ArrayList<Wall> walls;
 LandTile startTile;
 
 void setup() {
@@ -42,6 +43,7 @@ void newGame() {
   terrain = new ArrayList<LandTile>();
   startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
   terrain.add(startTile);
+  walls = new ArrayList<Wall>();
   
   PVector testBegin = startTile.end.copy().add(0, -40);
   PVector testEnd = testBegin.copy().add(tileWidth, 0);
@@ -49,6 +51,7 @@ void newGame() {
   //System.out.println(testEnd);
   LandTile testTile = new LandTile(testBegin, testEnd, false, color(255, 0, 0));
   terrain.add(testTile);
+  walls.add(new Wall(testTile.start.copy().add(0, 40), 40));
 
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
@@ -93,8 +96,9 @@ void drawTerrain() {
   //}
   
   // modified loop to incorporate changes in elevation
-  for (int index = 0; index < terrain.size(); index++) {
-    LandTile tile = terrain.get(index);
+  //for (int index = 0; index < terrain.size(); index++) {
+  for (LandTile tile : terrain) {
+    //LandTile tile = terrain.get(index);
     stroke(tile.col);
     line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
     if (tile.hasObstacle){
@@ -105,13 +109,21 @@ void drawTerrain() {
                //tile.start.x + tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
                obsApex.x, obsApex.y);
     }
-    int nextInd = index + 1;
-    if (nextInd < terrain.size()) {
-      LandTile next = terrain.get(nextInd);
-      if (next.start.y != tile.end.y) {
-        line(tile.end.x, tile.end.y, next.start.x, next.start.y);
-      }
-    }
+    //int nextInd = index + 1;
+    //if (nextInd < terrain.size()) {
+    //  LandTile next = terrain.get(nextInd);
+    //  if (next.start.y != tile.end.y) {
+    //    line(tile.end.x, tile.end.y, next.start.x, next.start.y);
+    //  }
+    //}
+  }
+  
+  for (Wall wall : walls) {
+    stroke(0, 0, 0);
+    //System.out.println(wall);
+    //System.out.println(terrain.get(1));
+    PVector pos = wall.getPos();
+    line(pos.x, pos.y, pos.x, pos.y - wall.getHeight());
   }
   // for indicating end of start tile
   //line(startTile.end.x, elev, startTile.end.x, 0);
@@ -165,17 +177,31 @@ void movePlayer() {
     
   // shift terrain left to produce illusion of character movement
   for (LandTile tile : terrain) tile.shift(p.getSpdX());
+  for (Wall wall : walls) wall.shift(p.getSpdX());
   
   // continuously generate new terrain as the game runs
   //if (terrain.get(0).end.x < 0) terrain.remove(0);
+  if (walls.size() > 0) {
+    for (int index = 0; index < walls.size(); index++) {
+      if (walls.get(index).getPos().x < 0) {
+        walls.remove(index);
+        index--;
+      }
+      
+    }
+  }
+  
   LandTile curTile = terrain.get(0);
   if (curTile.end.x < 0) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.3 ? true : false;
       willHaveObs = false;
-      terrain.add(new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
-                color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
+      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
+                                   color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+      terrain.add(next);
+      if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
+      
   }
   
   // vertical player movement
@@ -187,6 +213,9 @@ void movePlayer() {
 void checkCollision() {
   PVector[] corners = p.getCorners();
   
+  /*
+    Use lines to detect collisions instead of point
+  */
   // collision against obstacles and ground (vertical collisions)
   int grounded = 0;
   for (PVector corner : corners) {
@@ -199,6 +228,9 @@ void checkCollision() {
     }
     //else if (corner.y > tileUnder.start.y) endGame();
     else if (corner.y >= tileUnder.start.y) grounded++;
+    for (Wall wall : walls) {
+      if (Math.abs(corner.x - wall.getPos().x) < 2 && corner.y > wall.getTopElev()) endGame();
+    }
   }
   //int grounded = 0;
   //for (PVector corner : corners) {
@@ -215,7 +247,6 @@ void checkCollision() {
   }
   
   // collision against walls (horizontal collision)
-  
 }
 
 void gravity() {
