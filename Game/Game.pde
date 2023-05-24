@@ -20,6 +20,7 @@ LandTile startTile;
 void setup() {
   size(1200, 600);
   newGame(); 
+  //frameRate(20);
 }
 
 void newGame() {
@@ -155,6 +156,7 @@ void draw() {
   
   if (pause) pauseGame();
   else p.setSpdX(curSpd);
+  //System.out.println(terrain.size());
   
 }
 
@@ -171,7 +173,8 @@ void movePlayer() {
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.3 ? true : false;
-      terrain.add(new LandTile(lastTile.end.copy(), lastTile.end.copy().set(lastTile.end.x + tileWidth, lastTile.end.y), willHaveObs, 
+      willHaveObs = false;
+      terrain.add(new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
                 color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255))));
   }
   
@@ -182,9 +185,10 @@ void movePlayer() {
 }
 
 void checkCollision() {
-  
-  // collision against obstacles (vertical collision)
   PVector[] corners = p.getCorners();
+  
+  // collision against obstacles and ground (vertical collisions)
+  int grounded = 0;
   for (PVector corner : corners) {
     LandTile tileUnder = tileBelow(corner);
     if (tileUnder.hasObstacle) {
@@ -193,14 +197,14 @@ void checkCollision() {
       Line obsSurface = new Line(apex, endPt);
       if (obsSurface.output(corner.x) - corner.y <= 0) endGame();            
     }
+    //else if (corner.y > tileUnder.start.y) endGame();
+    else if (corner.y >= tileUnder.start.y) grounded++;
   }
-  
-  // collision against the ground (vertical collision)
-  int grounded = 0;
-  for (PVector corner : corners) {
-    LandTile underTile = tileBelow(corner);
-    if (corner.y >= underTile.start.y - 5) grounded++; 
-  }
+  //int grounded = 0;
+  //for (PVector corner : corners) {
+  //  LandTile underTile = tileBelow(corner);
+  //  if (corner.y >= underTile.start.y) grounded++; 
+  //}
   if (grounded >= 1) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
@@ -270,7 +274,8 @@ void keyPressed() {
   if (gameOver && key == 'a') {
     newGame();
   }
-  if (key == 'p') {
+  if (key == 'r' && pause) newGame();
+  if (key == 'q') {
     if (pause) resumeGame();
     else pauseGame();
   }
