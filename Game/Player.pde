@@ -1,4 +1,4 @@
-class Player { //<>// //<>//
+class Player { //<>//
   //private PVector[] corners;
   private PVector center;
   private int speedx;

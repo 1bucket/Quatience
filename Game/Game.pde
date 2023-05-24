@@ -22,6 +22,13 @@ void setup() {
   size(1200, 600);
   newGame(); 
   //frameRate(20);
+  //Line test1 = new Line(2, 0);
+  //Line test3 = new Line(new PVector(1, 2), new PVector(0, 1));
+  //PVector[] tests = test3.getEndpts();
+  //sortPtsY(tests);
+  //for (PVector endpt : tests) System.out.println(endpt);
+  //Line test2 = new Line(1, 1);
+  //System.out.println(test1.meetWithinDomain(2, 8, test2, -5, 2));
 }
 
 void newGame() {
@@ -29,7 +36,7 @@ void newGame() {
   pause = false;
   score = 0;
   
-  curSpd = 10;
+  curSpd = 5;
   tileWidth = width / 40;
   elev = height * 2 / 3;
   pause = false;
@@ -196,7 +203,7 @@ void movePlayer() {
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.3 ? true : false;
-      willHaveObs = false;
+      //willHaveObs = false;
       LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
                                    color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
       terrain.add(next);
@@ -213,10 +220,30 @@ void movePlayer() {
 void checkCollision() {
   PVector[] corners = p.getCorners();
   
-  /*
-    Use lines to detect collisions instead of point
-  */
-  // collision against obstacles and ground (vertical collisions)
+  // generate lines to represent each edge of the player's character
+  ArrayList<Line> playerEdges = new ArrayList<Line>();
+  for (int index = 0; playerEdges.size() != 4 && index < corners.length; index++) {
+    for (int aheadIndex = index + 1; aheadIndex < corners.length && playerEdges.size() != 4; aheadIndex++) {
+      //System.out.println(index);
+      if (corners[index].dist(corners[aheadIndex]) == tileWidth) playerEdges.add(new Line(corners[index], corners[aheadIndex]));
+    }
+  }
+  
+  // collision detection via line intersections walls
+  for (Line edge : playerEdges) {
+    PVector[] edgeEndpts = edge.getEndpts();
+    for (Wall wall : walls) {
+      sortPtsY(edgeEndpts);
+      boolean withinWallRange = edge.numInRange(edge.output(wall.getPos().x), edgeEndpts[1].y, edgeEndpts[0].y);
+      System.out.println(withinWallRange);
+      sortPtsX(edgeEndpts);
+      boolean atWallPos = edge.numInRange(wall.getPos().x, edgeEndpts[0].x, edgeEndpts[1].x);
+      //System.out.println(atWallPos);
+      if (withinWallRange && atWallPos) endGame();
+    }
+  }
+
+  // point collision via corners against ground and obstacles (vertical collisions)
   int grounded = 0;
   for (PVector corner : corners) {
     LandTile tileUnder = tileBelow(corner);
@@ -226,17 +253,8 @@ void checkCollision() {
       Line obsSurface = new Line(apex, endPt);
       if (obsSurface.output(corner.x) - corner.y <= 0) endGame();            
     }
-    //else if (corner.y > tileUnder.start.y) endGame();
-    else if (corner.y >= tileUnder.start.y) grounded++;
-    for (Wall wall : walls) {
-      if (Math.abs(corner.x - wall.getPos().x) < 2 && corner.y > wall.getTopElev()) endGame();
-    }
+    if (corner.y >= tileUnder.start.y) grounded++;
   }
-  //int grounded = 0;
-  //for (PVector corner : corners) {
-  //  LandTile underTile = tileBelow(corner);
-  //  if (corner.y >= underTile.start.y) grounded++; 
-  //}
   if (grounded >= 1) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
@@ -245,8 +263,6 @@ void checkCollision() {
     gravity();
     p.setRotAng(p.getRotAng() + PI / 36);
   }
-  
-  // collision against walls (horizontal collision)
 }
 
 void gravity() {
@@ -272,10 +288,28 @@ ArrayList<PVector> cornersOnGround() {
   return grounded;
 }
 
+void sortPtsX(PVector[] pts) {
+  PVector pt0 = pts[0];
+  PVector pt1 = pts[1];
+  if (pt0.x > pt1.x) {
+    pts[0] = pt1;
+    pts[1] = pt0;
+  }
+}
+  
+void sortPtsY(PVector[] pts) {
+  PVector pt0 = pts[0];
+  PVector pt1 = pts[1];
+  if (pt0.y > pt1.y) {
+    pts[0] = pt1;
+    pts[1] = pt0;
+  }
+}
+
 void endGame() {
   gameOver = true;
   p.setSpdX(0);
-  System.out.println("bonk");
+  //System.out.println("bonk");
 }
 
 void pauseGame() {
