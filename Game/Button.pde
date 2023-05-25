@@ -11,9 +11,9 @@ class Button {
   }
   
   public void displayButton() {
-    rectMode(CENTER);
+    //rectMode(CENTER);
     fill(74, 153, 255);
-    rect(pos.x, pos.y, bWidth, bHeight);
+    rect(pos.x - bWidth / 2, pos.y - bHeight / 2, bWidth, bHeight);
     fill(0, 0, 0);
     textSize(30);
     textAlign(CENTER);

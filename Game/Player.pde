@@ -1,4 +1,10 @@
-class Player { //<>//
+ //<>//
+// jump boost types
+final int NORMAL = 0;
+final int MINOR = 1;
+final int MAJOR = 2;
+
+class Player {
   //private PVector[] corners;
   private PVector center;
   private int speedx;
@@ -60,8 +66,12 @@ class Player { //<>//
     return corners;
   }
   
-  public void jump() {
-    speedy = 12;
+  public void jump(int boost) {
+    //System.out.println(boosted);
+    if (boost == NORMAL) speedy = 12;
+    else if (boost == MINOR) speedy = 16;
+    else if (boost == MAJOR) speedy = 20;
+    //speedy = boosted ? 20 : 12;
   } //<>//
   
   

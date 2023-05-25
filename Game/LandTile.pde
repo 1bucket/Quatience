@@ -3,6 +3,7 @@ static int tileWidth;
 class LandTile {
   PVector start, end;
   boolean hasObstacle;
+  boolean hasJumpPad;
   //Obstacle obs;
   int diff;
   
@@ -16,10 +17,11 @@ class LandTile {
     //                                                (start.y + start.y) / 2));
   }
   
-  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, color c) {
+  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, color c, boolean willHaveJumpPad) {
     start = newStart;
     end = newEnd;
     hasObstacle = willHaveObstacle;
+    hasJumpPad = willHaveJumpPad;
     //if (hasObstacle) obs = new Obstacle(new PVector((start.x + end.x) / 2,
                                                     //(start.y + start.y) / 2));
     col = c;
