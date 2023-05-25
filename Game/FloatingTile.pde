@@ -1,3 +1,0 @@
-class FloatingTile extends LandTile {
-  
-}
