@@ -2,7 +2,7 @@ class Player { //<>//
   //private PVector[] corners;
   private PVector center;
   private int speedx;
-  private int speedy;
+  private float speedy;
   private float rotAng;
   
   
@@ -22,7 +22,7 @@ class Player { //<>//
     return speedx;
   }
   
-  public int getSpdY() {
+  public float getSpdY() {
     return speedy;
   }
   
@@ -34,7 +34,7 @@ class Player { //<>//
     speedx = spdX;
   }
   
-  public void setSpdY(int spdY) {
+  public void setSpdY(float spdY) {
     speedy = spdY;
   }
   
@@ -61,7 +61,7 @@ class Player { //<>//
   }
   
   public void jump() {
-    speedy = 15;
+    speedy = 12;
   } //<>//
   
   

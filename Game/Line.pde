@@ -65,9 +65,7 @@ class Line {
     }
   }
   
-  public boolean numInRange(float test, float lowerBound, float upperBound) {
-    return test > lowerBound && test <= upperBound;
-  }
+  
   
   public float distToLine(PVector pt) {
     float nume = Math.abs(slope * pt.x - pt.y + yInt);

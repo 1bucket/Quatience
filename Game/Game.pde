@@ -37,7 +37,7 @@ void newGame() {
   score = 0;
   difficulty = EASY;
   
-  curSpd = 5;
+  curSpd = 7;
   tileWidth = width / 40;
   elev = height * 2 / 3;
   pause = false;
@@ -56,13 +56,13 @@ void newGame() {
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
   
-  PVector testBegin = startTile.end.copy().add(0, -40);
-  PVector testEnd = testBegin.copy().add(tileWidth, 0);
+  PVector testBegin = startTile.end.copy().add(0, -60);
+  PVector testEnd = testBegin.copy().add(tileWidth * 4, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
   LandTile testTile = new LandTile(testBegin, testEnd, false, color(255, 0, 0));
   terrain.add(testTile);
-  walls.add(new Wall(testTile.start.copy().add(0, 40), 40));
+  walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
@@ -154,7 +154,6 @@ void displayAllButtons() {
 
 void activateButton() {
   for (Button button : buttons)  {
-    //System.out.println(button.isMouseOnButton());
     if (mousePressed & button.isMouseOnButton()) {
       if (button.getText().equals("Resume")) 
         resumeGame();
@@ -179,8 +178,6 @@ void draw() {
   
   if (pause) pauseGame();
   else p.setSpdX(curSpd);
-  //System.out.println(terrain.size());
-  
 }
 
 
@@ -191,14 +188,12 @@ void movePlayer() {
   for (Wall wall : walls) wall.shift(p.getSpdX());
   
   // continuously generate new terrain as the game runs
-  //if (terrain.get(0).end.x < 0) terrain.remove(0);
   if (walls.size() > 0) {
     for (int index = 0; index < walls.size(); index++) {
       if (walls.get(index).getPos().x < 0) {
         walls.remove(index);
         index--;
       }
-      
     }
   }
   
@@ -212,7 +207,6 @@ void movePlayer() {
                                    color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
       terrain.add(next);
       if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
-      
   }
   
   // vertical player movement
@@ -232,46 +226,24 @@ void checkCollision() {
       if (corners[index].dist(corners[aheadIndex]) == tileWidth) playerEdges.add(new Line(corners[index], corners[aheadIndex]));
     }
   }
-  
-  // collision detection via line intersections walls
-  //for (Line edge : playerEdges) {
-  //  PVector[] edgeEndpts = edge.getEndpts();
-  //  for (Wall wall : walls) {
-  //    sortPtsY(edgeEndpts);
-  //    //boolean withinWallRange = edge.numInRange(edge.output(wall.getPos().x), edgeEndpts[0].y, edgeEndpts[1].y);
-  //    boolean withinWallRange = edge.numInRange(edgeEndpts[0].y, wall.getTopElev(), wall.getPos().y) || edge.numInRange(edgeEndpts[1].y, wall.getTopElev(), wall.getPos().y);
-  //    System.out.println(withinWallRange);
-  //    sortPtsX(edgeEndpts);
-  //    boolean atWallPos = edge.numInRange(wall.getPos().x, edgeEndpts[0].x, edgeEndpts[1].x);
-  //    //System.out.println(atWallPos);
-  //    if (withinWallRange && atWallPos) endGame();
-  //  }
-  //}
-  
-  Wall nextWall = null;
-  for (Wall wall : walls) {
-    boolean pBeforeWall = true;
-    for (PVector corner : corners) {
-      System.out.println(corner.x + "-" + wall.getPos().x);
-      pBeforeWall = pBeforeWall && corner.x < wall.getPos().x;
-    }
-    //System.out.println(pBeforeWall);
-    if (pBeforeWall) {
-      nextWall = wall;
-      break;
-    }
-  }
-  if (nextWall != null) {
-    for (PVector corner : corners) {
-      boolean b = corner.x > nextWall.getPos().x && corner.y > nextWall.getPos().y;
-      //System.out.println(b);
-      if (b) endGame();
-    }
-  }
 
+  PVector pCenter = p.getCenter();
   // point collision via corners against ground and obstacles (vertical collisions)
   int grounded = 0;
   for (PVector corner : corners) {
+    
+    // wall collision
+    
+    for (Wall wall : walls) {
+      PVector wallPos = wall.getPos();
+      if (wall.getDangerStatus() &&
+          pCenter.x < wallPos.x &&
+          numInRange(corner.x, wallPos.x, wallPos.x + tileWidth) && 
+          numInRange(corner.y, wall.getTopElev(), wallPos.y))
+        endGame();
+    }
+    
+    // ground and obstacle collision
     LandTile tileUnder = tileBelow(corner);
     if (tileUnder.hasObstacle) {
       PVector apex = tileUnder.getObsApex();
@@ -284,6 +256,7 @@ void checkCollision() {
   if (grounded >= 1 && p.getSpdY() <= 0) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
+    if (grounded == 2) pCenter.set(pCenter.x, tileBelow(pCenter).start.y - tileWidth / 2);
   }
   else {
     gravity();
@@ -332,6 +305,10 @@ void sortPtsY(PVector[] pts) {
   }
 }
 
+boolean numInRange(float test, float lowerBound, float upperBound) {
+  return test >= lowerBound && test < upperBound;
+}
+
 void endGame() {
   gameOver = true;
   p.setSpdX(0);
@@ -361,7 +338,7 @@ void resumeGame() {
 }
 
 void keyPressed() {
-  if (key == ' ' && cornersOnGround().size() == 2 && ! gameOver && ! pause) p.jump();
+  if (key == ' ' && p.getSpdY() == 0 && ! gameOver && ! pause) p.jump();
   if (gameOver && key == 'a') {
     newGame();
   }
