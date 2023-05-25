@@ -1,36 +1,32 @@
 static int tileWidth;
 
-class LandTile {
+class LandTile extends Structure {
   PVector start, end;
   boolean hasObstacle;
   boolean hasJumpPad;
   //Obstacle obs;
-  int diff;
+  //int diff;
   
   color col;
   
-  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle) {
-    start = newStart;
-    end = newEnd;
-    hasObstacle = willHaveObstacle;
-    //if (hasObstacle) obs = new Obstacle(new PVector((start.x + end.x) / 2,
-    //                                                (start.y + start.y) / 2));
-  }
-  
-  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, color c, boolean willHaveJumpPad) {
+  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, boolean willHaveJumpPad) {
+    super(new PVector((newStart.x + newEnd.x) / 2, newStart.y));
     start = newStart;
     end = newEnd;
     hasObstacle = willHaveObstacle;
     hasJumpPad = willHaveJumpPad;
-    //if (hasObstacle) obs = new Obstacle(new PVector((start.x + end.x) / 2,
-                                                    //(start.y + start.y) / 2));
+  }
+  
+  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, color c, boolean willHaveJumpPad) {
+    this(newStart, newEnd, willHaveObstacle, willHaveJumpPad);
     col = c;
   }
   
   public void shift(int xShift) {
+    super.shift(xShift);
     start.add(-xShift, 0);
     end.add(-xShift, 0);
-    diff += xShift;
+    //diff += xShift;
   }
   
   public PVector getObsApex() {

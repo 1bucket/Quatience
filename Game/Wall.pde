@@ -1,5 +1,5 @@
-class Wall {
-  private PVector pos; // the position of the foot of the wall
+class Wall extends Structure {
+  //private PVector pos; // the position of the foot of the wall
   private float wallH;
   private boolean canHit;
   
@@ -9,32 +9,24 @@ class Wall {
   }
   
   public Wall (PVector setPos, float setHeight) {
-    pos = setPos;
+    super(setPos);
     wallH = setHeight;
     LandTile nextTile = null;
     for (LandTile tile : terrain) {
-      if (tile.start.x == pos.x) {
+      if (tile.start.x == getPos().x) {
         nextTile = tile;
         break;
       }
     }
-    canHit = nextTile != null ? pos.y > nextTile.start.y : false; 
-  }
-  
-  public PVector getPos() {
-    return pos;
+    canHit = nextTile != null ? getPos().y > nextTile.start.y : false; 
   }
   
   public float getHeight() {
     return wallH;
   }
   
-  public void shift(float xShift) {
-    pos.add(- xShift, 0);
-  }
-  
   public float getTopElev() {
-    return pos.y - wallH;
+    return getPos().y - wallH;
   }
   
   public boolean getDangerStatus() {
@@ -42,6 +34,6 @@ class Wall {
   }
   
   public String toString() {
-    return pos + " - " + pos.copy().add(0, -wallH);
+    return getPos() + " - " + getPos().copy().add(0, -wallH);
   }
 }

@@ -1,17 +1,12 @@
 static int radius;
 
-class JumpOrb {
-  private PVector pos;
+class JumpOrb extends Structure {
   
   public JumpOrb(PVector pos) {
-    this.pos = pos;
-  }
-  
-  public PVector getPos() {
-    return pos;
+    super(pos);
   }
   
   public void shift(int xShift) {
-    pos.add(-xShift, 0);
+    getPos().add(-xShift, 0);
   }
 }
