@@ -61,7 +61,7 @@ class Player { //<>//
   }
   
   public void jump() {
-    speedy = 20;
+    speedy = 15;
   } //<>//
   
   

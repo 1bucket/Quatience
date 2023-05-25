@@ -35,6 +35,7 @@ void newGame() {
   gameOver = false;
   pause = false;
   score = 0;
+  difficulty = EASY;
   
   curSpd = 5;
   tileWidth = width / 40;
@@ -46,6 +47,9 @@ void newGame() {
   // for death animation
   opacity = 256;
   exploSize = (int) (tileWidth * sqrt(2));
+  
+  buttons = new ArrayList<Button>();
+  walls = new ArrayList<Wall>();
   
   terrain = new ArrayList<LandTile>();
   startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255));
@@ -63,7 +67,7 @@ void newGame() {
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
   
-  buttons = new ArrayList<Button>();
+  
 }
 
 void drawPlayer() {
@@ -202,7 +206,7 @@ void movePlayer() {
   if (curTile.end.x < 0) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
   if (terrain.size() < 45) {
-      boolean willHaveObs = Math.random() < 0.3 ? true : false;
+      boolean willHaveObs = Math.random() < 0.1 ? true : false;
       //willHaveObs = false;
       LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
                                    color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
@@ -230,16 +234,38 @@ void checkCollision() {
   }
   
   // collision detection via line intersections walls
-  for (Line edge : playerEdges) {
-    PVector[] edgeEndpts = edge.getEndpts();
-    for (Wall wall : walls) {
-      sortPtsY(edgeEndpts);
-      boolean withinWallRange = edge.numInRange(edge.output(wall.getPos().x), edgeEndpts[1].y, edgeEndpts[0].y);
-      System.out.println(withinWallRange);
-      sortPtsX(edgeEndpts);
-      boolean atWallPos = edge.numInRange(wall.getPos().x, edgeEndpts[0].x, edgeEndpts[1].x);
-      //System.out.println(atWallPos);
-      if (withinWallRange && atWallPos) endGame();
+  //for (Line edge : playerEdges) {
+  //  PVector[] edgeEndpts = edge.getEndpts();
+  //  for (Wall wall : walls) {
+  //    sortPtsY(edgeEndpts);
+  //    //boolean withinWallRange = edge.numInRange(edge.output(wall.getPos().x), edgeEndpts[0].y, edgeEndpts[1].y);
+  //    boolean withinWallRange = edge.numInRange(edgeEndpts[0].y, wall.getTopElev(), wall.getPos().y) || edge.numInRange(edgeEndpts[1].y, wall.getTopElev(), wall.getPos().y);
+  //    System.out.println(withinWallRange);
+  //    sortPtsX(edgeEndpts);
+  //    boolean atWallPos = edge.numInRange(wall.getPos().x, edgeEndpts[0].x, edgeEndpts[1].x);
+  //    //System.out.println(atWallPos);
+  //    if (withinWallRange && atWallPos) endGame();
+  //  }
+  //}
+  
+  Wall nextWall = null;
+  for (Wall wall : walls) {
+    boolean pBeforeWall = true;
+    for (PVector corner : corners) {
+      System.out.println(corner.x + "-" + wall.getPos().x);
+      pBeforeWall = pBeforeWall && corner.x < wall.getPos().x;
+    }
+    //System.out.println(pBeforeWall);
+    if (pBeforeWall) {
+      nextWall = wall;
+      break;
+    }
+  }
+  if (nextWall != null) {
+    for (PVector corner : corners) {
+      boolean b = corner.x > nextWall.getPos().x && corner.y > nextWall.getPos().y;
+      //System.out.println(b);
+      if (b) endGame();
     }
   }
 
@@ -255,7 +281,7 @@ void checkCollision() {
     }
     if (corner.y >= tileUnder.start.y) grounded++;
   }
-  if (grounded >= 1) {
+  if (grounded >= 1 && p.getSpdY() <= 0) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
   }
@@ -340,7 +366,7 @@ void keyPressed() {
     newGame();
   }
   if (key == 'r' && pause) newGame();
-  if (key == 'q') {
+  if (key == 'q' && ! gameOver) {
     if (pause) resumeGame();
     else pauseGame();
   }

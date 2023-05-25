@@ -66,7 +66,7 @@ class Line {
   }
   
   public boolean numInRange(float test, float lowerBound, float upperBound) {
-    return test >= lowerBound && test <= upperBound;
+    return test > lowerBound && test <= upperBound;
   }
   
   public float distToLine(PVector pt) {
