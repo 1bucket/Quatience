@@ -107,23 +107,8 @@ void drawPlayer() {
 
 
 void drawTerrain() {
-  //for (LandTile tile : terrain) {
-  //  stroke(tile.col);
-  //  line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
-  //  if (tile.hasObstacle){
-  //    fill(tile.col);
-  //    PVector obsApex = tile.getObsApex();
-  //    triangle(tile.start.x, tile.start.y,
-  //             tile.start.x + tileWidth, tile.start.y,
-  //             //tile.start.x + tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
-  //             obsApex.x, obsApex.y);
-  //  }
-  //}
-  
   // modified loop to incorporate changes in elevation
-  //for (int index = 0; index < terrain.size(); index++) {
   for (LandTile tile : terrain) {
-    //LandTile tile = terrain.get(index);
     stroke(tile.col);
     line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
     if (tile.hasObstacle){
@@ -131,7 +116,6 @@ void drawTerrain() {
       PVector obsApex = tile.getObsApex();
       triangle(tile.start.x, tile.start.y,
                tile.start.x + tileWidth, tile.start.y,
-               //tile.start.x + tileWidth / 2, tile.start.y - (float) Math.sqrt(3) / 2 * tileWidth);
                obsApex.x, obsApex.y);
     }
     else if (tile.hasJumpPad) {
