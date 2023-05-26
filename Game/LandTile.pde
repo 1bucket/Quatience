@@ -1,28 +1,31 @@
 static int tileWidth;
-static final int ABOVE = 0;
-static final int BELOW = 1;
+static final int NONE = 0;
+static final int ABOVE = 1;
+static final int BELOW = 2;
 
 class LandTile extends Structure {
   PVector start, end;
-  boolean hasObstacle;
+  //boolean hasObstacle;
   boolean hasJumpPad;
-  int obsPos;
+  private int obsStatus;
+  boolean isMidair;
   //Obstacle obs;
   //int diff;
   
   color col;
   
-  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, boolean willHaveJumpPad, int obsOrient) {
-    super(new PVector((newStart.x + newEnd.x) / 2, newStart.y));
-    start = newStart;
-    end = newEnd;
-    hasObstacle = willHaveObstacle;
+  public LandTile(PVector newStart, PVector newEnd,  boolean willHaveJumpPad, int obsOrient, boolean isMidair) {
+    super(new PVector((newStart.x + newEnd.x) / 2, isMidair ? newStart.y - 5 : newStart.y));
+    start = isMidair ? newStart.add(0, -5) : newStart;
+    end = isMidair ? newEnd.add(0, -5) : newEnd;
+    //hasObstacle = willHaveObstacle;
     hasJumpPad = willHaveJumpPad;
-    obsPos = obsOrient;
+    obsStatus = obsOrient;
+    this.isMidair = isMidair;
   }
   
-  public LandTile(PVector newStart, PVector newEnd, boolean willHaveObstacle, color c, boolean willHaveJumpPad, int obsOrient) {
-    this(newStart, newEnd, willHaveObstacle, willHaveJumpPad, obsOrient);
+  public LandTile(PVector newStart, PVector newEnd, color c, boolean willHaveJumpPad, int obsOrient, boolean isMidAir) {
+    this(newStart, newEnd, willHaveJumpPad, obsOrient, isMidAir);
     col = c;
   }
   
@@ -33,12 +36,14 @@ class LandTile extends Structure {
     //diff += xShift;
   }
   
+  public int getObsStatus() {
+    return obsStatus;
+  }
+  
   public PVector getObsApex() {
-    if (hasObstacle) {
-      if (obsPos == ABOVE)
-        return new PVector(start.x + tileWidth / 2, start.y - (float) Math.sqrt(3) / 2 * tileWidth );
-      else return new PVector(start.x + tileWidth / 2, start.y + 5 + (float) sqrt(3) / 2 * tileWidth);
-    }
+    if (obsStatus == ABOVE)
+      return new PVector(start.x + tileWidth / 2, start.y - (float) Math.sqrt(3) / 2 * tileWidth );
+    else if (obsStatus == BELOW) return new PVector(start.x + tileWidth / 2, start.y + 5 + (float) sqrt(3) / 2 * tileWidth);
     else return null;
   }
   

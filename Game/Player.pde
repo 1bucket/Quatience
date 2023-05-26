@@ -1,4 +1,4 @@
- //<>// //<>//
+ //<>// //<>// //<>//
 // jump boost types
 final int NORMAL = 0;
 final int MINOR = 1;
@@ -72,7 +72,7 @@ class Player {
     else if (boost == MINOR) speedy = 16;
     else if (boost == MAJOR) speedy = 20;
     //speedy = boosted ? 20 : 12;
-  } //<>// //<>//
+  } //<>// //<>// //<>//
   
   
 }

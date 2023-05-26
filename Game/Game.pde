@@ -18,6 +18,7 @@ ArrayList<LandTile> terrain;
 ArrayList<Wall> walls;
 ArrayList<JumpOrb> jumpOrbs;
 LandTile startTile;
+LandTile testTile;
 
 void setup() {
   size(1200, 600);
@@ -55,7 +56,7 @@ void newGame() {
   walls = new ArrayList<Wall>();
   
   terrain = new ArrayList<LandTile>();
-  startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), false, color(255, 255, 255), false);
+  startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), color(255, 255, 255), false, 0, false);
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
   
@@ -66,9 +67,10 @@ void newGame() {
   PVector testEnd = testBegin.copy().add(tileWidth * 4, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
-  LandTile testTile = new LandTile(testBegin, testEnd, false, color(255, 0, 0), true);
+  testTile = new LandTile(testBegin, testEnd, color(255, 0, 0), true, 2, true);
   terrain.add(testTile);
-  walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
+  terrain.add(new LandTile(testBegin.copy().add(0, 65), testEnd.copy().add(0, 65), color(255, 0, 0), false, 0, false));
+  //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
   p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
@@ -111,14 +113,27 @@ void drawTerrain() {
   for (LandTile tile : terrain) {
     stroke(tile.col);
     line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
-    if (tile.hasObstacle){
+    if (tile.isMidair) {
+      walls.add(new Wall(tile.start.copy().add(0, 5), 5));
+      walls.add(new Wall(tile.end.copy().add(0, 5), 5));
+      line(tile.start.x, tile.start.y + 5, tile.end.x, tile.end.y + 5);
+    }
+    int obsStatus = tile.getObsStatus(); 
+    if (obsStatus != 0) {
       fill(tile.col);
       PVector obsApex = tile.getObsApex();
-      triangle(tile.start.x, tile.start.y,
-               tile.start.x + tileWidth, tile.start.y,
-               obsApex.x, obsApex.y);
+      if (obsStatus == 1){
+        triangle(tile.start.x, tile.start.y,
+                 tile.start.x + tileWidth, tile.start.y,
+                 obsApex.x, obsApex.y);
+      }
+      else if (obsStatus == 2) {
+        triangle(tile.start.x, tile.start.y + 5,
+                 tile.start.x + tileWidth, tile.start.y + 5,
+                 obsApex.x, obsApex.y);
+      }
     }
-    else if (tile.hasJumpPad) {
+    if (tile.hasJumpPad) {
       fill(tile.col);
       //System.out.println(tile.start.x);
       rect(tile.start.x, tile.start.y - 5, Math.abs(tile.start.x - tile.end.x), 5);
@@ -219,15 +234,17 @@ void movePlayer() {
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.1 ? true : false;
       //willHaveObs = false;
-      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), willHaveObs, 
-                                   color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), false);
+      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), 
+                                   color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), false, willHaveObs ? 1 : 0, false);
       terrain.add(next);
-      if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
+      //if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
   }
   
   // vertical player movement
   PVector pCenter = p.getCenter();
+  LandTile belowTile = tileBelow(pCenter);
   pCenter.add(0, - p.getSpdY());
+  pCenter.set(pCenter.x, constrain(pCenter.y, Float.NEGATIVE_INFINITY, belowTile.start.y - tileWidth / 2));
   checkCollision();
 }
 
@@ -250,15 +267,38 @@ void checkCollision() {
         endGame();
     }
     
-    // ground and obstacle collision
+    
+    //System.out.println(testTile.getObsStatus());
+    //System.out.println("p" + tileUnder.getObsStatus());
+    
+    // obstacle collision detection
     LandTile tileUnder = tileBelow(corner);
-    if (tileUnder.hasObstacle) {
+    if (pCenter.y > 400) System.out.println(pCenter.y);
+    if (tileUnder.getObsStatus() == 1) {
       PVector apex = tileUnder.getObsApex();
       PVector endPt = corner.x > tileUnder.start.x + tileWidth / 2 ? tileUnder.end : tileUnder.start;
       Line obsSurface = new Line(apex, endPt);
-      if (obsSurface.output(corner.x) - corner.y <= 0) endGame();            
+      if (obsSurface.output(corner.x) - corner.y <= 0 && pCenter.y < tileUnder.start.y) endGame();            
     }
-    if (corner.y >= tileUnder.start.y) {
+    
+    // ceiliing collision detection
+    LandTile tileAbove = tileAbove(corner);
+    if (tileAbove != null) {
+      if (tileAbove.getObsStatus() == 2) {
+        PVector apex = tileAbove.getObsApex();
+        PVector endPt = corner.x > tileAbove.start.x + tileWidth / 2  ? tileAbove.end.copy().add(0, 5) : tileAbove.start.copy().add(0, 5);
+        Line obsSurface = new Line(apex, endPt);
+        if (corner.y - obsSurface.output(corner.x) <= 0 && pCenter.y > tileAbove.start.y + 5) endGame();
+      }
+      else if (corner.y <= tileAbove.start.y + 5 && pCenter.y > tileAbove.start.y + 5) {
+        endGame();
+      }
+    }
+    
+    
+    
+    // ground collision detection
+    if (corner.y >= tileUnder.start.y && pCenter.y < tileUnder.start.y) {
       if (tileUnder.hasJumpPad) {
         p.jump(MAJOR);
         grounded = 0;
@@ -282,9 +322,19 @@ void gravity() {
   p.setSpdY(p.getSpdY() - 1);
 }
 
-LandTile tileBelow(PVector corner) {
+LandTile tileBelow(PVector point) {
+  PVector pCenter = p.getCenter();
   for (LandTile tile : terrain) {
-    if (corner.x >= tile.start.x && corner.x <= tile.end.x)
+    if (point.x >= tile.start.x && point.x <= tile.end.x && pCenter.y < tile.start.y)
+      return tile;
+  }
+  return null;
+}
+
+LandTile tileAbove(PVector point) {
+  PVector pCenter = p.getCenter();
+  for (LandTile tile : terrain) {
+    if (point.x >= tile.start.x && point.x <= tile.end.x && pCenter.y > tile.start.y)
       return tile;
   }
   return null;
