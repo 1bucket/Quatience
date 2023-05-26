@@ -4,12 +4,14 @@ final int EASY = 0;
 final int MEDIUM = 1;
 final int HARD = 2;
 int score = 0;
-int elev;
+int baseElev;
 boolean gameOver;
 ArrayList<Button> buttons;
 
 Player p;
 color pCol;
+color themeColor;
+int lineWeight;
 int curSpd;
 int exploSize;
 int opacity;
@@ -40,9 +42,11 @@ void newGame() {
   difficulty = EASY;
   pause = false;
   
+  themeColor = color(132, 0, 218);
+  lineWeight = 2;
   
   tileWidth = width / 40;
-  elev = height * 2 / 3;
+  baseElev = height * 2 / 3;
   radius = 20;
   
   pCol = color(32, 129, 255);
@@ -56,23 +60,25 @@ void newGame() {
   walls = new ArrayList<Wall>();
   
   terrain = new ArrayList<LandTile>();
-  startTile = new LandTile(new PVector (0, elev), new PVector(width, elev), color(255, 255, 255), false, 0, false);
+  startTile = new LandTile(new PVector (0, baseElev), new PVector(width, baseElev), false, 0, false);
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
   
+  
+  // testing elements
   jumpOrbs = new ArrayList<JumpOrb>();
   jumpOrbs.add(new JumpOrb(new PVector(width * .75, 325)));
   
-  PVector testBegin = startTile.end.copy().add(0, -60);
+  PVector testBegin = startTile.end.copy().add(0, -70);
   PVector testEnd = testBegin.copy().add(tileWidth * 4, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
-  testTile = new LandTile(testBegin, testEnd, color(255, 0, 0), true, 2, true);
+  testTile = new LandTile(testBegin, testEnd,  true, 2, true);
   terrain.add(testTile);
-  terrain.add(new LandTile(testBegin.copy().add(0, 65), testEnd.copy().add(0, 65), color(255, 0, 0), false, 0, false));
+  terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
   //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
-  p = new Player(new PVector(180, elev - tileWidth / 2), curSpd);
+  p = new Player(new PVector(180, baseElev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
   
   
@@ -87,21 +93,19 @@ void drawOrbs() {
 }
 
 void drawPlayer() {
-  noStroke();
+  
   fill(pCol);
+  
   if (gameOver) {
     // death animation
+    noStroke();
     fill(pCol, opacity -= 20);
     circle(p.getCenter().x, p.getCenter().y, exploSize += 5);
   }
   else {
+    stroke(0);
+    strokeWeight(1.5);
     PVector[] corners = p.getCorners();
-    for (int index = 0; index < corners.length; index++) {
-      PVector corner = corners[index];
-      LandTile underTile = tileBelow(corner);
-      Line surface = new Line (underTile.start, underTile.end);
-      corners[index].set(corners[index].x, constrain(corner.y, 0, surface.output(corner.x)));
-    }
     quad(corners[0].x, corners[0].y, corners[1].x, corners[1].y,
          corners[2].x, corners[2].y, corners[3].x, corners[3].y);
   }
@@ -109,18 +113,34 @@ void drawPlayer() {
 
 
 void drawTerrain() {
+  System.out.println(startTile.end.x);
   // modified loop to incorporate changes in elevation
+  strokeWeight(lineWeight);
   for (LandTile tile : terrain) {
-    stroke(tile.col);
-    line(tile.start.x, tile.start.y, tile.end.x, tile.end.y);
+    stroke(themeColor);
+    
+    
     if (tile.isMidair) {
-      walls.add(new Wall(tile.start.copy().add(0, 5), 5));
-      walls.add(new Wall(tile.end.copy().add(0, 5), 5));
-      line(tile.start.x, tile.start.y + 5, tile.end.x, tile.end.y + 5);
+      line(tile.start.x, tile.start.y + 10, tile.end.x, tile.end.y + 10);
     }
+    else {
+      noStroke();
+      fill(0);
+      rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
+      stroke(themeColor);
+      for (int row = tile.start.y; row < height; row++) {
+        for (int col = tile.start.x; row < tile.end.x; col++) {
+        }
+      }
+    }
+    strokeWeight(3);
+    line(tile.start.x, tile.start.y + 2, tile.end.x, tile.end.y + 2);
     int obsStatus = tile.getObsStatus(); 
     if (obsStatus != 0) {
-      fill(tile.col);
+      fill(0);
+      stroke(themeColor);
+      strokeWeight(2);
+      
       PVector obsApex = tile.getObsApex();
       if (obsStatus == 1){
         triangle(tile.start.x, tile.start.y,
@@ -128,15 +148,15 @@ void drawTerrain() {
                  obsApex.x, obsApex.y);
       }
       else if (obsStatus == 2) {
-        triangle(tile.start.x, tile.start.y + 5,
-                 tile.start.x + tileWidth, tile.start.y + 5,
+        triangle(tile.start.x, tile.start.y + 10,
+                 tile.start.x + tileWidth, tile.start.y + 10,
                  obsApex.x, obsApex.y);
       }
     }
     if (tile.hasJumpPad) {
-      fill(tile.col);
+      fill(themeColor);
       //System.out.println(tile.start.x);
-      rect(tile.start.x, tile.start.y - 5, Math.abs(tile.start.x - tile.end.x), 5);
+      rect(tile.start.x, tile.start.y - 2, Math.abs(tile.start.x - tile.end.x), 2);
     }
     //int nextInd = index + 1;
     //if (nextInd < terrain.size()) {
@@ -148,7 +168,8 @@ void drawTerrain() {
   }
   
   for (Wall wall : walls) {
-    stroke(0, 0, 0);
+    stroke(themeColor);
+    
     //System.out.println(wall);
     //System.out.println(terrain.get(1));
     PVector pos = wall.getPos();
@@ -183,7 +204,7 @@ void activateButton() {
 }
 
 void draw() {
-  background(255, 222, 131);
+  background(72, 0, 119);
   if (! gameOver && ! pause) {
     score += 5;
     movePlayer();
@@ -229,13 +250,16 @@ void movePlayer() {
   
   
   LandTile curTile = terrain.get(0);
-  if (curTile.end.x < 0) terrain.remove(curTile);
+  if (curTile.end.x < -5) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
+  
+  // filler random chunk generator
   if (terrain.size() < 45) {
       boolean willHaveObs = Math.random() < 0.1 ? true : false;
       //willHaveObs = false;
-      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, elev), lastTile.end.copy().set(lastTile.end.x + tileWidth, elev), 
-                                   color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)), false, willHaveObs ? 1 : 0, false);
+      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, baseElev), 
+                                   lastTile.end.copy().set(lastTile.end.x + tileWidth, baseElev), 
+                                   false, willHaveObs ? 1 : 0, false);
       terrain.add(next);
       //if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
   }

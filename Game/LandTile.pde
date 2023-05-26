@@ -22,6 +22,10 @@ class LandTile extends Structure {
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
     this.isMidair = isMidair;
+    if (isMidair) {
+      walls.add(new Wall(start.copy().add(0, 10), 10));
+      walls.add(new Wall(end.copy().add(0, 10), 10));
+    }
   }
   
   public LandTile(PVector newStart, PVector newEnd, color c, boolean willHaveJumpPad, int obsOrient, boolean isMidAir) {
@@ -43,7 +47,7 @@ class LandTile extends Structure {
   public PVector getObsApex() {
     if (obsStatus == ABOVE)
       return new PVector(start.x + tileWidth / 2, start.y - (float) Math.sqrt(3) / 2 * tileWidth );
-    else if (obsStatus == BELOW) return new PVector(start.x + tileWidth / 2, start.y + 5 + (float) sqrt(3) / 2 * tileWidth);
+    else if (obsStatus == BELOW) return new PVector(start.x + tileWidth / 2, start.y + 10 + (float) sqrt(3) / 2 * tileWidth);
     else return null;
   }
   
