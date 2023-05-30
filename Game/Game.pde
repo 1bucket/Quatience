@@ -212,7 +212,7 @@ void draw() {
   }
   displayScore();
   drawTerrain();
-  drawUnderground();
+  //drawUnderground();
   drawPlayer();
   drawOrbs();
   displayAllButtons();
