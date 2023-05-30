@@ -19,6 +19,8 @@ int opacity;
 ArrayList<LandTile> terrain;
 ArrayList<Wall> walls;
 ArrayList<JumpOrb> jumpOrbs;
+ArrayList<PVector> rectPoints;
+int rWidth;
 LandTile startTile;
 LandTile testTile;
 
@@ -46,6 +48,7 @@ void newGame() {
   
   themeColor = color(132, 0, 218);
   lineWeight = 2;
+  rWidth = 120;
   
   tileWidth = width / 40;
   baseElev = height * 2 / 3;
@@ -65,6 +68,7 @@ void newGame() {
   startTile = new LandTile(new PVector (0, baseElev), new PVector(width, baseElev), false, 0, false);
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
+  rectPoints = new ArrayList<PVector>();
   
   
   // testing elements
@@ -127,8 +131,12 @@ void drawTerrain() {
     }
     else {
       noStroke();
-      fill(themeColor);
+      fill(0);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
+      //fill(themeColor, 200);
+      //rect(constrain(tile.start.x, 0, tile.end.x), baseElev + 10, tile.end.x, 10);
+      //rect(constrain(tile.start.x, 0, tile.end.x), baseElev + 20, 10, height);
+      //rect(tile.end.x, baseElev + 20, 10, height);
       stroke(themeColor);
     }
     strokeWeight(3);
@@ -197,10 +205,9 @@ void activateButton() {
 }
 
 void drawUnderground() {
-  for (int row = baseElev + 1; row < height; row++) {
-    int gradient = (int) ( (row - baseElev) / (float) (height - baseElev) * 255);
-    stroke(0, 0, 0, gradient);
-    line(0, row, width, row);
+  fill(themeColor, 150);
+  for (PVector rectCorn : rectPoints) {
+    rect(rectCorn.x, rectCorn.y, rWidth, height);
   }
 }
 
@@ -212,7 +219,7 @@ void draw() {
   }
   displayScore();
   drawTerrain();
-  //drawUnderground();
+  drawUnderground();
   drawPlayer();
   drawOrbs();
   displayAllButtons();
@@ -228,6 +235,7 @@ void movePlayer() {
   for (LandTile tile : terrain) tile.shift(p.getSpdX());
   for (Wall wall : walls) wall.shift(p.getSpdX());
   for (JumpOrb orb : jumpOrbs) orb.shift(p.getSpdX());
+  for (PVector rectCorn : rectPoints) rectCorn.add(- p.getSpdX(), 0);
   
   // continuously generate new terrain as the game runs
   if (walls.size() > 0) {
@@ -247,6 +255,13 @@ void movePlayer() {
     }
   }
   
+  if (rectPoints.size() > 0) {
+    for (int index = 0; index < rectPoints.size(); index++) {
+      if (rectPoints.get(index).x < - rWidth) {
+        rectPoints.remove(index--);
+      }
+    }
+  }
   
   
   LandTile curTile = terrain.get(0);
@@ -262,6 +277,11 @@ void movePlayer() {
                                    false, willHaveObs ? 1 : 0, false);
       terrain.add(next);
       //if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
+  }
+  
+  if (rectPoints.size() < 5) {
+    if (rectPoints.size() == 0) rectPoints.add(new PVector(p.getCenter().x, baseElev + 20));
+    else rectPoints.add(rectPoints.get(rectPoints.size() - 1).copy().add(40, 0));
   }
   
   // vertical player movement
