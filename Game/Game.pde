@@ -25,6 +25,7 @@ LandTile startTile;
 LandTile testTile;
 
 void setup() {
+  
   size(1200, 600);
   newGame(); 
   //frameRate(60);
@@ -69,7 +70,6 @@ void newGame() {
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
   rectPoints = new ArrayList<PVector>();
-  
   
   // testing elements
   jumpOrbs = new ArrayList<JumpOrb>();
