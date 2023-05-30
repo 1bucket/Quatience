@@ -27,7 +27,7 @@ LandTile testTile;
 void setup() {
   size(1200, 600);
   newGame(); 
-  //frameRate(20);
+  //frameRate(60);
   //Line test1 = new Line(2, 0);
   //Line test3 = new Line(new PVector(1, 2), new PVector(0, 1));
   //PVector[] tests = test3.getEndpts();
@@ -47,7 +47,7 @@ void newGame() {
   pause = false;
   
   themeColor = color(132, 0, 218);
-  lineWeight = 2;
+  lineWeight = 1;
   rWidth = 120;
   
   tileWidth = width / 40;
@@ -117,7 +117,6 @@ void drawPlayer() {
   }
 }
 
-
 void drawTerrain() {
   //System.out.println(startTile.end.x);
   // modified loop to incorporate changes in elevation
@@ -125,27 +124,28 @@ void drawTerrain() {
   for (LandTile tile : terrain) {
     stroke(themeColor);
     
-    
+    fill(red(themeColor) - 70, green(themeColor), blue(themeColor) - 90);
     if (tile.isMidair) {
+      //fill(darker);
+      //System.out.println(constrain(tile.start.x, 0, tile.end.x));
+      //System.out.println(tile.end.x);
       line(tile.start.x, tile.start.y + 10, tile.end.x, tile.end.y + 10);
+      rect(tile.start.x, tile.start.y, tile.end.x - tile.start.x, 10);
     }
     else {
       noStroke();
-      fill(0);
+      
+      //fill(darker);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
-      //fill(themeColor, 200);
-      //rect(constrain(tile.start.x, 0, tile.end.x), baseElev + 10, tile.end.x, 10);
-      //rect(constrain(tile.start.x, 0, tile.end.x), baseElev + 20, 10, height);
-      //rect(tile.end.x, baseElev + 20, 10, height);
       stroke(themeColor);
     }
-    strokeWeight(3);
-    line(tile.start.x, tile.start.y + 2, tile.end.x, tile.end.y + 2);
+    //strokeWeight(3);
+    //line(tile.start.x, tile.start.y + 2, tile.end.x, tile.end.y + 2);
     int obsStatus = tile.getObsStatus(); 
     if (obsStatus != 0) {
       fill(0);
       stroke(themeColor);
-      strokeWeight(2);
+      strokeWeight(1);
       
       PVector obsApex = tile.getObsApex();
       if (obsStatus == 1){
@@ -205,14 +205,15 @@ void activateButton() {
 }
 
 void drawUnderground() {
-  fill(themeColor, 150);
+  fill(themeColor, 100);
+  noStroke();
   for (PVector rectCorn : rectPoints) {
     rect(rectCorn.x, rectCorn.y, rWidth, height);
   }
 }
 
 void draw() {
-  background(72, 0, 119);
+  background(red(themeColor), green(themeColor) + 70, blue(themeColor));
   if (! gameOver && ! pause) {
     score += 5;
     movePlayer();
@@ -263,7 +264,6 @@ void movePlayer() {
     }
   }
   
-  
   LandTile curTile = terrain.get(0);
   if (curTile.end.x < -5) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
@@ -279,10 +279,11 @@ void movePlayer() {
       //if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
   }
   
-  if (rectPoints.size() < 5) {
-    if (rectPoints.size() == 0) rectPoints.add(new PVector(p.getCenter().x, baseElev + 20));
-    else rectPoints.add(rectPoints.get(rectPoints.size() - 1).copy().add(40, 0));
+  while (rectPoints.size() < 12) {
+    if (rectPoints.size() == 0) rectPoints.add(new PVector(0, baseElev + 20));
+    else rectPoints.add(rectPoints.get(rectPoints.size() - 1).copy().add(rWidth + 20, 0));
   }
+  
   
   // vertical player movement
   PVector pCenter = p.getCenter();
