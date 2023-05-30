@@ -33,9 +33,11 @@ void setup() {
   //for (PVector endpt : tests) System.out.println(endpt);
   //Line test2 = new Line(1, 1);
   //System.out.println(test1.meetWithinDomain(2, 8, test2, -5, 2));
+  //drawUnderground();
 }
 
 void newGame() {
+  
   gameOver = false;
   pause = false;
   score = 0;
@@ -113,7 +115,7 @@ void drawPlayer() {
 
 
 void drawTerrain() {
-  System.out.println(startTile.end.x);
+  //System.out.println(startTile.end.x);
   // modified loop to incorporate changes in elevation
   strokeWeight(lineWeight);
   for (LandTile tile : terrain) {
@@ -125,13 +127,9 @@ void drawTerrain() {
     }
     else {
       noStroke();
-      fill(0);
+      fill(themeColor);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
       stroke(themeColor);
-      for (int row = tile.start.y; row < height; row++) {
-        for (int col = tile.start.x; row < tile.end.x; col++) {
-        }
-      }
     }
     strokeWeight(3);
     line(tile.start.x, tile.start.y + 2, tile.end.x, tile.end.y + 2);
@@ -158,13 +156,8 @@ void drawTerrain() {
       //System.out.println(tile.start.x);
       rect(tile.start.x, tile.start.y - 2, Math.abs(tile.start.x - tile.end.x), 2);
     }
-    //int nextInd = index + 1;
-    //if (nextInd < terrain.size()) {
-    //  LandTile next = terrain.get(nextInd);
-    //  if (next.start.y != tile.end.y) {
-    //    line(tile.end.x, tile.end.y, next.start.x, next.start.y);
-    //  }
-    //}
+   
+    
   }
   
   for (Wall wall : walls) {
@@ -203,6 +196,14 @@ void activateButton() {
   }
 }
 
+void drawUnderground() {
+  for (int row = baseElev + 1; row < height; row++) {
+    int gradient = (int) ( (row - baseElev) / (float) (height - baseElev) * 255);
+    stroke(0, 0, 0, gradient);
+    line(0, row, width, row);
+  }
+}
+
 void draw() {
   background(72, 0, 119);
   if (! gameOver && ! pause) {
@@ -211,6 +212,7 @@ void draw() {
   }
   displayScore();
   drawTerrain();
+  drawUnderground();
   drawPlayer();
   drawOrbs();
   displayAllButtons();
@@ -219,8 +221,6 @@ void draw() {
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
 }
-
-
 
 void movePlayer() {
     
