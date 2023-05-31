@@ -83,14 +83,14 @@ void newGame() {
   //System.out.println(testBegin);
   //System.out.println(testEnd);
   testTile = new LandTile(testBegin, testEnd,  true, 0, false);
-  terrain.add(testTile);
+  //terrain.add(testTile);
   LandTile spike = new LandTile(testEnd.copy(), testEnd.copy().add(tileWidth, 0), true, 1, false);
-  terrain.add(spike);
-  for (int index = 0; index < 5; index++) {
-    LandTile next = spike.copy();
-    next.shift(-tileWidth * (index + 1));
-    terrain.add(next);
-  }
+  //terrain.add(spike);
+  //for (int index = 0; index < 5; index++) {
+  //  LandTile next = spike.copy();
+  //  next.shift(-tileWidth * (index + 1));
+  //  terrain.add(next);
+  //}
   jumpOrbs = new ArrayList<JumpOrb>();
   jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
   //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
@@ -176,8 +176,7 @@ void drawTerrain() {
     }
     if (tile.hasJumpPad) {
       fill(themeColor);
-      //System.out.println(tile.start.x);
-      rect(tile.start.x, tile.start.y - 2, Math.abs(tile.start.x - tile.end.x), 2);
+      rect(tile.start.x, tile.start.y - 5, Math.abs(tile.start.x - tile.end.x), 5);
     }
    
     
@@ -488,7 +487,8 @@ void resumeGame() {
 
 void keyPressed() {
   if (key == ' ' && ! gameOver && ! pause) {
-    if (cornersOnGround().size() == 2) p.jump(NORMAL);
+    //if (cornersOnGround().size() == 2) p.jump(NORMAL);
+    if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
     else if (checkOrbCollision()) p.jump(MINOR);
   }
   if (gameOver && key == 'a') {
