@@ -47,7 +47,8 @@ void newGame() {
   difficulty = EASY;
   pause = false;
   
-  themeColor = color(132, 0, 218);
+  //themeColor = color(132, 0, 218);
+  themeColor = color(0, 15, 221);
   lineWeight = 1;
   rWidth = 120;
   
@@ -55,7 +56,8 @@ void newGame() {
   baseElev = height * 2 / 3;
   radius = 20;
   
-  pCol = color(32, 129, 255);
+  //pCol = color(32, 129, 255);
+  pCol = color(0, 255, 246);
   curSpd = 7;
   
   // for death animation
@@ -100,7 +102,7 @@ void drawOrbs() {
 
 void drawPlayer() {
   
-  fill(pCol);
+  fill(0);
   
   if (gameOver) {
     // death animation
@@ -109,7 +111,7 @@ void drawPlayer() {
     circle(p.getCenter().x, p.getCenter().y, exploSize += 5);
   }
   else {
-    stroke(0);
+    stroke(pCol);
     strokeWeight(1.5);
     PVector[] corners = p.getCorners();
     quad(corners[0].x, corners[0].y, corners[1].x, corners[1].y,

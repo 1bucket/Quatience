@@ -6,7 +6,7 @@ class Line {
   // for slope -intercept form
   private float slope;
   private float yInt;
-  PVector[] endpts;
+  private PVector[] endpts;
   
   // construct a line given 2 points
   public Line(PVector p1, PVector p2) {

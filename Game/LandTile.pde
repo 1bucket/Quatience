@@ -6,13 +6,13 @@ static final int BELOW = 2;
 class LandTile extends Structure {
   PVector start, end;
   //boolean hasObstacle;
-  boolean hasJumpPad;
+  private boolean hasJumpPad;
   private int obsStatus;
-  boolean isMidair;
+  private boolean isMidair;
   //Obstacle obs;
   //int diff;
   
-  color col;
+  //private color col;
   
   public LandTile(PVector newStart, PVector newEnd,  boolean willHaveJumpPad, int obsOrient, boolean isMidair) {
     super(new PVector((newStart.x + newEnd.x) / 2, isMidair ? newStart.y - 5 : newStart.y));
@@ -28,10 +28,10 @@ class LandTile extends Structure {
     }
   }
   
-  public LandTile(PVector newStart, PVector newEnd, color c, boolean willHaveJumpPad, int obsOrient, boolean isMidAir) {
-    this(newStart, newEnd, willHaveJumpPad, obsOrient, isMidAir);
-    col = c;
-  }
+  //public LandTile(PVector newStart, PVector newEnd, color c, boolean willHaveJumpPad, int obsOrient, boolean isMidAir) {
+  //  this(newStart, newEnd, willHaveJumpPad, obsOrient, isMidAir);
+  //  col = c;
+  //}
   
   public void shift(int xShift) {
     super.shift(xShift);

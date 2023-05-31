@@ -6,7 +6,7 @@ class JumpOrb extends Structure {
     super(pos);
   }
   
-  public void shift(int xShift) {
-    getPos().add(-xShift, 0);
-  }
+  //public void shift(int xShift) {
+  //  getPos().add(-xShift, 0);
+  //}
 }
