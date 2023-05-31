@@ -16,8 +16,8 @@ class LandTile extends Structure {
   
   public LandTile(PVector newStart, PVector newEnd,  boolean willHaveJumpPad, int obsOrient, boolean isMidair) {
     super(new PVector((newStart.x + newEnd.x) / 2, isMidair ? newStart.y - 5 : newStart.y));
-    start = isMidair ? newStart.add(0, -5) : newStart;
-    end = isMidair ? newEnd.add(0, -5) : newEnd;
+    start = isMidair ? newStart.add(0, -10) : newStart;
+    end = isMidair ? newEnd.add(0, -10) : newEnd;
     //hasObstacle = willHaveObstacle;
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
@@ -49,6 +49,10 @@ class LandTile extends Structure {
       return new PVector(start.x + tileWidth / 2, start.y - (float) Math.sqrt(3) / 2 * tileWidth );
     else if (obsStatus == BELOW) return new PVector(start.x + tileWidth / 2, start.y + 10 + (float) sqrt(3) / 2 * tileWidth);
     else return null;
+  }
+  
+  public LandTile copy() {
+    return new LandTile(start.copy(), end.copy(), hasJumpPad, obsStatus, isMidair);
   }
   
   public String toString() {

@@ -2,7 +2,7 @@ boolean pause;
 int difficulty;
 final int EASY = 0;
 final int MEDIUM = 1;
-final int HARD = 2;
+final int DIFFICULT = 2;
 int score = 0;
 int baseElev;
 boolean gameOver;
@@ -16,6 +16,7 @@ int curSpd;
 int exploSize;
 int opacity;
 
+Chunk gen;
 ArrayList<LandTile> terrain;
 ArrayList<Wall> walls;
 ArrayList<JumpOrb> jumpOrbs;
@@ -67,6 +68,7 @@ void newGame() {
   buttons = new ArrayList<Button>();
   walls = new ArrayList<Wall>();
   
+  gen = new Chunk();
   terrain = new ArrayList<LandTile>();
   startTile = new LandTile(new PVector (0, baseElev), new PVector(width, baseElev), false, 0, false);
   terrain.add(startTile);
@@ -74,25 +76,36 @@ void newGame() {
   rectPoints = new ArrayList<PVector>();
   
   // testing elements
-  jumpOrbs = new ArrayList<JumpOrb>();
-  jumpOrbs.add(new JumpOrb(new PVector(width * .75, 325)));
   
-  PVector testBegin = startTile.end.copy().add(0, -70);
-  PVector testEnd = testBegin.copy().add(tileWidth * 4, 0);
+  
+  PVector testBegin = startTile.end.copy();
+  PVector testEnd = testBegin.copy().add(tileWidth, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
-  testTile = new LandTile(testBegin, testEnd,  true, 2, true);
+  testTile = new LandTile(testBegin, testEnd,  true, 0, false);
   terrain.add(testTile);
-  terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
+  LandTile spike = new LandTile(testEnd.copy(), testEnd.copy().add(tileWidth, 0), true, 1, false);
+  terrain.add(spike);
+  for (int index = 0; index < 5; index++) {
+    LandTile next = spike.copy();
+    next.shift(-tileWidth * (index + 1));
+    terrain.add(next);
+  }
+  jumpOrbs = new ArrayList<JumpOrb>();
+  jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
+  //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
   //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
   p = new Player(new PVector(180, baseElev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
-  
+  lastElev = baseElev;
+  lastXPos = terrain.get(terrain.size() - 1).end.x;
   
 }
 
 void drawOrbs() {
+  noStroke();
+  fill(red(pCol) + 42, green(pCol) + 40, blue(pCol) + 34);
   for (JumpOrb orb : jumpOrbs) {
     //System.out.println("hello");
     PVector pos = orb.getPos();
@@ -215,6 +228,9 @@ void drawUnderground() {
 }
 
 void draw() {
+  //System.out.println(terrain.size());
+  //System.out.println("p" + p.getCenter());
+  //System.out.println(terrain.get(terrain.size() - 1).end.x);
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
   if (! gameOver && ! pause) {
     score += 5;
@@ -223,8 +239,8 @@ void draw() {
   displayScore();
   drawTerrain();
   drawUnderground();
-  drawPlayer();
   drawOrbs();
+  drawPlayer();
   displayAllButtons();
   activateButton();
   
@@ -240,7 +256,7 @@ void movePlayer() {
   for (JumpOrb orb : jumpOrbs) orb.shift(p.getSpdX());
   for (PVector rectCorn : rectPoints) rectCorn.add(- p.getSpdX(), 0);
   
-  // continuously generate new terrain as the game runs
+  
   if (walls.size() > 0) {
     for (int index = 0; index < walls.size(); index++) {
       if (walls.get(index).getPos().x < 0) {
@@ -270,15 +286,16 @@ void movePlayer() {
   if (curTile.end.x < -5) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
   
+  // continuously generate new terrain as the game runs
   // filler random chunk generator
-  if (terrain.size() < 45) {
-      boolean willHaveObs = Math.random() < 0.1 ? true : false;
-      //willHaveObs = false;
-      LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, baseElev), 
-                                   lastTile.end.copy().set(lastTile.end.x + tileWidth, baseElev), 
-                                   false, willHaveObs ? 1 : 0, false);
-      terrain.add(next);
-      //if (next.start.y != lastTile.end.y) walls.add(new Wall(next.start.copy(), Math.abs(lastTile.end.y - next.end.y))); 
+  if (terrain.get(terrain.size() - 1).end.x < width) {
+    gen.genChunk();
+    //boolean willHaveObs = Math.random() < 0.1 ? true : false;
+    //willHaveObs = false;
+    //LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, baseElev), 
+    //                             lastTile.end.copy().set(lastTile.end.x + tileWidth, baseElev), 
+    //                             false, willHaveObs ? 1 : 0, false);
+    //terrain.add(next);
   }
   
   while (rectPoints.size() < 12) {
@@ -371,11 +388,22 @@ void gravity() {
 
 LandTile tileBelow(PVector point) {
   PVector pCenter = p.getCenter();
+  ArrayList<LandTile> cands = new ArrayList<LandTile>();
   for (LandTile tile : terrain) {
     if (point.x >= tile.start.x && point.x <= tile.end.x && pCenter.y < tile.start.y)
-      return tile;
+      cands.add(tile);
   }
-  return null;
+  float diff = Integer.MAX_VALUE;
+  LandTile closest = null;
+  for (LandTile cand : cands) {
+    float curDiff = abs(pCenter.y - cand.start.y);
+    if (curDiff < diff) {
+      diff = curDiff;
+      closest = cand;
+    }
+  }
+  return closest;
+
 }
 
 LandTile tileAbove(PVector point) {
@@ -391,9 +419,7 @@ LandTile tileAbove(PVector point) {
 boolean checkOrbCollision() {
   PVector pCenter = p.getCenter();
   for (JumpOrb orb : jumpOrbs) {
-    //System.out.println(pCenter.dist(orb.getPos()));
     if (pCenter.dist(orb.getPos()) < radius + 20) {
-      System.out.println("hello");
       return true;
     }
   }

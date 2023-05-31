@@ -81,8 +81,7 @@ class Player {
     if (boost == NORMAL) speedy = 12;
     else if (boost == MINOR) speedy = 14;
     else if (boost == MAJOR) speedy = 18;
-    //speedy = boosted ? 20 : 12;
-  } //<>//
-  
+  }
+   //<>//
   
 }
