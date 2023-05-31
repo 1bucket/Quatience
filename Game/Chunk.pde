@@ -45,6 +45,7 @@ class Chunk {
         //PVector end = start.copy().add(tileWidth, 0);
         //terrain.add(new LandTile(start, end, false, 1, false));
         genSafezone();
+
         break;
       case 1:
         break;
