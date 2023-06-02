@@ -5,7 +5,7 @@ class Wall extends Structure {
   
   public Wall (PVector setPos, float setHeight, boolean dangerStatus) {
     this(setPos, setHeight);
-    canHit = dangerStatus;
+    canHit = dangerStatus; // true if wall is deadly, false otherwise
   }
   
   public Wall (PVector setPos, float setHeight) {

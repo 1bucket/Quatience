@@ -9,6 +9,7 @@ boolean gameOver;
 ArrayList<Button> buttons;
 
 Player p;
+boolean canJump;
 color pCol;
 color themeColor;
 int lineWeight;
@@ -60,6 +61,7 @@ void newGame() {
   //pCol = color(32, 129, 255);
   pCol = color(0, 255, 246);
   curSpd = 6;
+  canJump = true;
   
   // for death animation
   opacity = 256;
@@ -78,13 +80,16 @@ void newGame() {
   // testing elements
   
   
-  PVector testBegin = startTile.end.copy();
+  PVector testBegin = startTile.end.copy().add(0, -tileWidth);
   PVector testEnd = testBegin.copy().add(tileWidth, 0);
   //System.out.println(testBegin);
   //System.out.println(testEnd);
-  testTile = new LandTile(testBegin, testEnd,  true, 0, false);
+  //testTile = new LandTile(testBegin, testEnd,  false, 0, false);
   //terrain.add(testTile);
-  LandTile spike = new LandTile(testEnd.copy(), testEnd.copy().add(tileWidth, 0), true, 1, false);
+  //PVector wat = testEnd.copy().add(0, tileWidth);
+  //terrain.add(new LandTile(wat, wat.copy().add(tileWidth, 0), false, 0, false));
+  //terrain.add(testTile);
+  //LandTile spike = new LandTile(testEnd.copy(), testEnd.copy().add(tileWidth, 0), true, 1, false);
   //terrain.add(spike);
   //for (int index = 0; index < 5; index++) {
   //  LandTile next = spike.copy();
@@ -98,8 +103,6 @@ void newGame() {
 
   p = new Player(new PVector(180, baseElev - tileWidth / 2), curSpd);
   //stroke(0, 0, 0);
-  lastElev = baseElev;
-  lastXPos = terrain.get(terrain.size() - 1).end.x;
   
 }
 
@@ -150,8 +153,11 @@ void drawTerrain() {
     else {
       noStroke();
       
-      //fill(darker);
+      //fill(255, 0, 0);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
+      if (tile.start.y != baseElev) {
+        rect(tile.start.x, tile.start.y, tileWidth, abs(baseElev - tile.start.y));
+      }
       stroke(themeColor);
     }
     //strokeWeight(3);
@@ -175,7 +181,7 @@ void drawTerrain() {
       }
     }
     if (tile.hasJumpPad) {
-      fill(themeColor);
+      fill(pCol);
       rect(tile.start.x, tile.start.y - 5, Math.abs(tile.start.x - tile.end.x), 5);
     }
    
@@ -374,10 +380,12 @@ void checkCollision() {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
     if (grounded == 2) pCenter.set(pCenter.x, tileBelow(pCenter).start.y - tileWidth / 2);
+    canJump = true;
   }
   else {
     gravity();
     p.setRotAng(p.getRotAng() + PI / 45);
+    canJump = false;
   }
 }
 
@@ -489,10 +497,14 @@ void keyPressed() {
   if (key == ' ' && ! gameOver && ! pause) {
     //if (cornersOnGround().size() == 2) p.jump(NORMAL);
     //if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
-    PVector pCenter = p.getCenter();
-    if (abs(pCenter.y - tileBelow(pCenter).start.y) == tileWidth / 2) p.jump(NORMAL);
-    //if (canJump) p.jump(NORMAL);
-    else if (checkOrbCollision()) p.jump(MINOR);
+    //PVector pCenter = p.getCenter();
+    //if (abs(pCenter.y - tileBelow(pCenter).start.y) == tileWidth / 2) p.jump(NORMAL);
+    if (canJump) {
+      if (checkOrbCollision()) p.jump(MINOR);
+      else p.jump(NORMAL);
+      canJump = false;
+    }
+    //else if (checkOrbCollision()) p.jump(MINOR);
   }
   if (gameOver && key == 'a') {
     newGame();
