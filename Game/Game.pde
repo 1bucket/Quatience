@@ -59,7 +59,7 @@ void newGame() {
   
   //pCol = color(32, 129, 255);
   pCol = color(0, 255, 246);
-  curSpd = 7;
+  curSpd = 6;
   
   // for death animation
   opacity = 256;
@@ -92,7 +92,7 @@ void newGame() {
   //  terrain.add(next);
   //}
   jumpOrbs = new ArrayList<JumpOrb>();
-  jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
+  //jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
   //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
   //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
@@ -232,7 +232,7 @@ void draw() {
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
   if (! gameOver && ! pause) {
-    score += 5;
+    score++;
     movePlayer();
   }
   displayScore();
@@ -488,7 +488,10 @@ void resumeGame() {
 void keyPressed() {
   if (key == ' ' && ! gameOver && ! pause) {
     //if (cornersOnGround().size() == 2) p.jump(NORMAL);
-    if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
+    //if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
+    PVector pCenter = p.getCenter();
+    if (abs(pCenter.y - tileBelow(pCenter).start.y) == tileWidth / 2) p.jump(NORMAL);
+    //if (canJump) p.jump(NORMAL);
     else if (checkOrbCollision()) p.jump(MINOR);
   }
   if (gameOver && key == 'a') {
