@@ -157,7 +157,7 @@ void drawTerrain() {
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
       if (tile.start.y != baseElev) {
         stroke(red(themeColor) - 80, green(themeColor), blue(themeColor) - 120);
-        strokeWeight(3);
+        strokeWeight(2);
         rect(tile.start.x, tile.start.y, tileWidth, abs(baseElev - tile.start.y));
       }
       stroke(themeColor);
@@ -190,14 +190,14 @@ void drawTerrain() {
     
   }
   
-  for (Wall wall : walls) {
-    stroke(themeColor);
+  //for (Wall wall : walls) {
+  //  stroke(themeColor);
     
-    //System.out.println(wall);
-    //System.out.println(terrain.get(1));
-    PVector pos = wall.getPos();
-    line(pos.x, pos.y, pos.x, pos.y - wall.getHeight());
-  }
+  //  //System.out.println(wall);
+  //  //System.out.println(terrain.get(1));
+  //  PVector pos = wall.getPos();
+  //  line(pos.x, pos.y, pos.x, pos.y - wall.getHeight());
+  //}
   // for indicating end of start tile
   //line(startTile.end.x, elev, startTile.end.x, 0);
   stroke(200, 150, 200);
@@ -275,7 +275,7 @@ void movePlayer() {
   
   if (jumpOrbs.size() > 0) {
     for (int index = 0; index < jumpOrbs.size(); index++) {
-      if (jumpOrbs.get(index).getPos().x < 0) {
+      if (jumpOrbs.get(index).getPos().x + radius < 0) {
         jumpOrbs.remove(index--);
       }
     }
@@ -501,9 +501,9 @@ void keyPressed() {
     //if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
     //PVector pCenter = p.getCenter();
     //if (abs(pCenter.y - tileBelow(pCenter).start.y) == tileWidth / 2) p.jump(NORMAL);
+    if (checkOrbCollision()) p.jump(MINOR);
     if (canJump) {
-      if (checkOrbCollision()) p.jump(MINOR);
-      else p.jump(NORMAL);
+      p.jump(NORMAL);
       canJump = false;
     }
     //else if (checkOrbCollision()) p.jump(MINOR);
