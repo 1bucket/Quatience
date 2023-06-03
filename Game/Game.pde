@@ -156,6 +156,8 @@ void drawTerrain() {
       //fill(255, 0, 0);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
       if (tile.start.y != baseElev) {
+        stroke(red(themeColor) - 80, green(themeColor), blue(themeColor) - 120);
+        strokeWeight(3);
         rect(tile.start.x, tile.start.y, tileWidth, abs(baseElev - tile.start.y));
       }
       stroke(themeColor);
