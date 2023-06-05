@@ -434,16 +434,6 @@ boolean checkOrbCollision() {
   }
   return false;
 }
-ArrayList<PVector> cornersOnGround() {
-  ArrayList<PVector> grounded = new ArrayList<PVector>();
-  for (PVector corner : p.getCorners()) {
-    LandTile underTile = tileBelow(corner);
-    //Line surface = new Line(underTile.start, underTile.end);
-    //if (surface.output(corner.x) - corner.y <= 0) grounded.add(corner);
-    if (corner.y >= underTile.start.y - 1) grounded.add(corner);
-  }
-  return grounded;
-}
 
 void sortPtsX(PVector[] pts) {
   PVector pt0 = pts[0];

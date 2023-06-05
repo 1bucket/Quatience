@@ -1,4 +1,4 @@
-// jump boost types //<>// //<>//
+// jump boost types //<>//
 final int NORMAL = 0;
 final int MINOR = 1;
 final int MAJOR = 2;

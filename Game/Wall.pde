@@ -13,7 +13,7 @@ class Wall extends Structure {
     wallH = setHeight;
     LandTile nextTile = null;
     for (LandTile tile : terrain) {
-      if (tile.start.x == getPos().x) {
+      if (tile.start.x == getPos().x) {  
         nextTile = tile;
         break;
       }
