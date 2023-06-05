@@ -22,9 +22,9 @@ class LandTile extends Structure {
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
     this.isMidair = isMidair;
-    if (isMidair) {
+    if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
       walls.add(new Wall(start.copy().add(0, 10), 10));
-      walls.add(new Wall(end.copy().add(0, 10), 10));
+      //walls.add(new Wall(end.copy().add(0, 10), 10));
     }
   }
   

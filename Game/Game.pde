@@ -55,7 +55,7 @@ void newGame() {
   rWidth = 120;
   
   tileWidth = width / 40;
-  baseElev = height * 2 / 3;
+  baseElev = height * 3 / 4;
   radius = 20;
   
   //pCol = color(32, 129, 255);
@@ -235,6 +235,7 @@ void drawUnderground() {
 }
 
 void draw() {
+  System.out.println(canJump);
   //System.out.println(terrain.size());
   //System.out.println("p" + p.getCenter());
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
@@ -331,8 +332,7 @@ void checkCollision() {
     // wall collision
     for (Wall wall : walls) {
       PVector wallPos = wall.getPos();
-      if (wall.getDangerStatus() &&
-          pCenter.x < wallPos.x &&
+      if (pCenter.x < wallPos.x &&
           numInRange(corner.x, wallPos.x, wallPos.x + tileWidth) && 
           numInRange(corner.y, wall.getTopElev(), wallPos.y))
         endGame();
@@ -344,7 +344,6 @@ void checkCollision() {
     
     // obstacle collision detection
     LandTile tileUnder = tileBelow(corner);
-    if (pCenter.y > 400) System.out.println(pCenter.y);
     if (tileUnder.getObsStatus() == 1) {
       PVector apex = tileUnder.getObsApex();
       PVector endPt = corner.x > tileUnder.start.x + tileWidth / 2 ? tileUnder.end : tileUnder.start;
@@ -381,7 +380,9 @@ void checkCollision() {
   if (grounded >= 1 && p.getSpdY() <= 0) {
     p.setRotAng(PI / 4);
     p.setSpdY(0);
-    if (grounded == 2) pCenter.set(pCenter.x, tileBelow(pCenter).start.y - tileWidth / 2);
+    if (grounded == 2) {
+      pCenter.set(pCenter.x, tileBelow(pCenter).start.y - tileWidth / 2);
+    }
     canJump = true;
   }
   else {

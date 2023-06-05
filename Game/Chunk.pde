@@ -3,17 +3,18 @@ class Chunk {
   void genChunk() {
     int rand = (int) (Math.random() * 100);
     int easyChance, medChance;
+    //difficulty = DIFFICULT;
     if (difficulty == EASY) {
       // test probabilities
-      //easyChance = 100;
-      //medChance = 0;
+      easyChance = 100;
+      medChance = 0;
       easyChance = 0;
-      medChance = 100;
+      medChance = 0;
       
       // real chances
-      //easyChance = 65;
-      //medChance = 30;
-      //hardChance = 5;
+      //easyChance = 80;
+      //medChance = 20;
+      //hardChance = 0;
       /** variable hardChance is not used but is kept
        and commented out as a reference */
     } else if (difficulty == MEDIUM) {
@@ -21,11 +22,11 @@ class Chunk {
       medChance = 65;
       //hardChance = 10;
     } else {
-      easyChance = 10;
+      easyChance = 5;
       medChance = 40;
-      //hardChance = 50;
+      //hardChance = 55;
     }
-
+  
     if (rand < easyChance) {
       genEasyChunk();
 
@@ -39,7 +40,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    randChunk = 8;
+    //randChunk = 5;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -100,7 +101,7 @@ class Chunk {
       case 9: // jumpPad + 2 high wall
         PVector foot = lastTileEnd.copy().add(tileWidth, 0);
         terrain.add(new LandTile(lastTileEnd.copy(), foot.copy(), true, 0, false));
-        walls.add(new Wall(foot.copy(), 2 * tileWidth, true));
+        walls.add(new Wall(foot.copy(), 2 * tileWidth));
         genSafezone(1, foot.copy().add(0, -2 * tileWidth), false);
         genSafezone(1, foot.copy(), false);
         break;
@@ -118,8 +119,8 @@ class Chunk {
   }
 
   void genMedChunk() {
-    int randChunk = (int) (Math.random() * 12);
-    randChunk = 5;
+    int randChunk = (int) (Math.random() * 11);
+    //randChunk = 10;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -142,7 +143,7 @@ class Chunk {
       case 2: // jumpOrb + 2x4 wall
         jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(tileWidth, -2.75 * tileWidth)));
         genSafezone(2, lastTileEnd.copy().add(3 * tileWidth, -4 * tileWidth), false);
-        walls.add(new Wall(lastTileEnd.copy().add(3 * tileWidth, 0), 4 * tileWidth, true));
+        walls.add(new Wall(lastTileEnd.copy().add(3 * tileWidth, 0), 4 * tileWidth));
         genSafezone(5, lastTileEnd.copy(), false);
         break;
       case 3: // 11 spikes + 3 orbs
@@ -162,23 +163,71 @@ class Chunk {
           genSafezone(4, lastTileEnd.copy().add((2 + numSafes * 6) * tileWidth, 0), false);
         }
         break;
-      case 5: // 4 orb staircase
+      case 5: // 3 orb staircase
         for (int orbs = 0; orbs < 3; orbs++) {
-          jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add((tileWidth / 2 + orbs * 3.5) * tileWidth, (-2 + -3 * orbs) * tileWidth)));
+          jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(tileWidth / 2 + orbs * 3.5 * tileWidth, (-2 + -3 * orbs) * tileWidth)));
         }
-        //genSpikes(
-        
-        
-        
-        
-        
-        
+        genSpikes(10, 1, false, lastTileEnd.copy());
+        walls.add(new Wall(lastTileEnd.copy().add(10 * tileWidth, 0), 9 * tileWidth));
+        genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, -9 * tileWidth), false);
+        genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, 0), false);
+        break;
+      case 6: // varying-elev platforms over 40 spikes
+        genSafezone(4, lastTileEnd.copy().add(0, -tileWidth), false);
+        genSafezone(3, lastTileEnd.copy().add(7 * tileWidth, -1.5  *tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(14 * tileWidth, -2 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(21 * tileWidth, -3 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(28 * tileWidth, -tileWidth), true);
+        genSpikes(30, 1, false, lastTileEnd.copy().add(4 * tileWidth, 0));
+        break;
+      case 7: // case 6 w/ bait
+        genSafezone(4, lastTileEnd.copy().add(0, -tileWidth), false);
+        genSafezone(3, lastTileEnd.copy().add(7 * tileWidth, -1.5  *tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(14 * tileWidth, -2 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(21 * tileWidth, -3 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(29 * tileWidth, -4 * tileWidth), true);
+        genSpikes(1, 1, true, lastTileEnd.copy().add(28 * tileWidth, -4 * tileWidth));
+        genSafezone(5, lastTileEnd.copy().add(26 * tileWidth, -tileWidth), true);
+        genSpikes(25, 1, false, lastTileEnd.copy().add(4 * tileWidth, 0));
+        break;
+      case 8: // jumpOrb bait
+        genPlat(1, lastTileEnd.copy(), true, 0, false);
+        genSpikes(3, 2, true, lastTileEnd.copy().add(12 * tileWidth, -6 * tileWidth));
+        genSpikes(1, 1, false, lastTileEnd.copy().add(2 * tileWidth, -3 * tileWidth));
+        walls.add(new Wall(lastTileEnd.copy().add(2 * tileWidth, 0), 3 * tileWidth));
+        genSafezone(2, lastTileEnd.copy().add(tileWidth, 0), false);
+        genSpikes(5, 1, false, lastTileEnd.copy().add(3 * tileWidth, 0));
+        jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(5.5 * tileWidth, -3.5 * tileWidth)));
+        jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(10.5 * tileWidth, -3.5 * tileWidth)));
+        break;
+      case 9: // jumpOrb staircase bait
+        for (int orbs = 0; orbs < 3; orbs++) {
+          jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(tileWidth / 2 + orbs * 3.5 * tileWidth, (-2 + -3 * orbs) * tileWidth)));
+        }
+        genSpikes(3, 1, true, lastTileEnd.copy().add(14.5 * tileWidth, - tileWidth));
+        genSpikes(7, 1, false, lastTileEnd.copy());
+        genSafezone(10, lastTileEnd.copy().add(7 * tileWidth, 0), false);
+        break;
+      case 10: // jumpPad + downward staircase bait
+        genPlat(1, lastTileEnd.copy(), true, 0, false);
+        genSafezone(1, lastTileEnd.copy().add(3 * tileWidth, -4 * tileWidth), true);
+        genPlat(1, lastTileEnd.copy().add(4 * tileWidth, -4 * tileWidth), true, 0, true);
+        genSafezone(1, lastTileEnd.copy().add(5 * tileWidth, -4 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(10 * tileWidth, -8 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(15 * tileWidth, -7 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(20 * tileWidth, -6 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(25 * tileWidth, -5 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(30 * tileWidth, -4 * tileWidth), true);
+        genSpikes(1, 1, true, lastTileEnd.copy().add(35 * tileWidth, -3 * tileWidth));
+        genSafezone(2, lastTileEnd.copy().add(36 * tileWidth, -3 * tileWidth), true);
+        genSpikes(37, 1, false, lastTileEnd.copy().add(tileWidth, 0));
+        break;
     }
   }
 
   void genHardChunk() {
-    int randChunk = (int) (Math.random() * 12);
-    randChunk = 0;
+    int randChunk = (int) (Math.random() * 3);
+    randChunk = 3;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -189,6 +238,30 @@ class Chunk {
         genSpikes(1, 2, true, lastTileEnd.copy().add(0, -4.75 * tileWidth));
         genSafezone(1, lastTileEnd.copy(), false);
         break;
+      case 1: // 3 high spikes
+        for (int numSpikes = 0; numSpikes < 3; numSpikes++) {
+          genSpikes(1, 1, false, lastTileEnd.copy().add(7 * numSpikes * tileWidth, -1.25 * tileWidth));
+          genSpikes(1, 2, true, lastTileEnd.copy().add(7 * numSpikes * tileWidth, -4.75 * tileWidth));
+          genSafezone(7, lastTileEnd.copy().add(7 * numSpikes * tileWidth, 0), false);          
+        }
+        break;
+      case 2: // tunnel w/ 4 1x3 plat
+        genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        for (int numRises = 0; numRises < 4; numRises++) {
+          genSafezone(1, lastTileEnd.copy().add(9 * numRises * tileWidth, -2.5 * tileWidth), false);
+          genSafezone(9, lastTileEnd.copy().add(9 * numRises * tileWidth, 0), false);
+        }
+        break;
+      case 3: // tunnel w/ 1x3 plats, jump baits
+        genSafezone(40, lastTileEnd.copy().add(0, -4 * tileWidth), true);
+        for (int numRises = 0; numRises < 4; numRises++) {
+          genSafezone(1, lastTileEnd.copy().add(18 * numRises * tileWidth, -2.5 * tileWidth), false);
+          genSafezone(9, lastTileEnd.copy().add(18 * numRises * tileWidth, 0), false);
+        }
+        for (int numDucks = 0; numDucks < 4; numDucks++) {
+          genSpikes(1, 2, true, lastTileEnd.copy().add((9 + 18 * numDucks) * tileWidth, -3.5 * tileWidth));
+          genSafezone(9, lastTileEnd.copy().add((9 + 18 * numDucks) * tileWidth, 0), false);
+        }
     }
   }
 
@@ -196,15 +269,15 @@ class Chunk {
     //System.out.println("bruh");
     int toAdd = 7;
     switch(difficulty) {
-    case EASY:
-      toAdd += (int) (Math.random() * 10);
-      break;
-    case MEDIUM:
-      toAdd += (int) (Math.random() * 7);
-      break;
-    case DIFFICULT:
-      toAdd += (int) (Math.random() * 5);
-      break;
+      case EASY:
+        toAdd += (int) (Math.random() * 10);
+        break;
+      case MEDIUM:
+        toAdd += (int) (Math.random() * 7);
+        break;
+      case DIFFICULT:
+        toAdd += (int) (Math.random() * 5);
+        break;
     }
     PVector lastTileEnd = terrain.get(terrain.size() - 1).end.copy();
     genSafezone(toAdd, lastTileEnd, false);
@@ -221,7 +294,7 @@ class Chunk {
   
   void genPlat(int numTiles, PVector start, boolean willHaveJumpPad, int spikeOrient, boolean isMidair) {
     if (! isMidair && start.y != baseElev) {
-      walls.add(new Wall(new PVector(start.x, baseElev), abs(start.y - baseElev), true)); 
+      walls.add(new Wall(new PVector(start.x, baseElev), abs(start.y - baseElev))); 
     }
     for (int tile = 0; tile < numTiles; tile++) {
       PVector tileStart = start.copy().add((tile * tileWidth), 0);
