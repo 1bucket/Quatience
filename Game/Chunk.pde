@@ -227,7 +227,7 @@ class Chunk {
 
   void genHardChunk() {
     int randChunk = (int) (Math.random() * 3);
-    randChunk = 3;
+    randChunk = 5;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -252,16 +252,39 @@ class Chunk {
           genSafezone(9, lastTileEnd.copy().add(9 * numRises * tileWidth, 0), false);
         }
         break;
-      case 3: // tunnel w/ 1x3 plats, jump baits
-        genSafezone(40, lastTileEnd.copy().add(0, -4 * tileWidth), true);
-        for (int numRises = 0; numRises < 4; numRises++) {
-          genSafezone(1, lastTileEnd.copy().add(18 * numRises * tileWidth, -2.5 * tileWidth), false);
-          genSafezone(9, lastTileEnd.copy().add(18 * numRises * tileWidth, 0), false);
+      case 3: // 1, 2 plats over 30 spikes
+        for (int numPlats = 0; numPlats < 5; numPlats++) {
+          genSafezone(1, lastTileEnd.copy().add((1 + 8 * numPlats) * tileWidth, -2 * tileWidth), true);
+          genSafezone(3, lastTileEnd.copy().add((3 + 8 * numPlats) * tileWidth, -tileWidth), true);
         }
-        for (int numDucks = 0; numDucks < 4; numDucks++) {
-          genSpikes(1, 2, true, lastTileEnd.copy().add((9 + 18 * numDucks) * tileWidth, -3.5 * tileWidth));
-          genSafezone(9, lastTileEnd.copy().add((9 + 18 * numDucks) * tileWidth, 0), false);
+        genSpikes(39, 1, false, lastTileEnd.copy());
+        break;
+      case 4: // jumpPad baits
+        for (int num = 0; num < 9; num++) {
+          
+          genSafezone(5, lastTileEnd.copy().add((-1 + 16 * num) * tileWidth, 0), false);
+          genSafezone(5, lastTileEnd.copy().add((-1 + 16 * num) * tileWidth, -0.5 * tileWidth), false);
+          walls.add(new Wall(lastTileEnd.copy().add(16 * num * tileWidth, 0), 0.5 * tileWidth));
+          
+          boolean hasJumpPad = num > 1 ? (int) (Math.random() * 3) > 0 : true;
+          genSpikes(3, 1, false, lastTileEnd.copy().add((4 + 16 * num) * tileWidth, 0));
+          genSafezone(4, lastTileEnd.copy().add((7 + 16 * num) * tileWidth, -0.5 * tileWidth), false);
+          genPlat(1, lastTileEnd.copy().add((11 + 16 * num) * tileWidth, -0.5 * tileWidth), hasJumpPad, 0, false);
+          genSafezone(4, lastTileEnd.copy().add((7 + 16 * num) * tileWidth, 0), false);
+          
+          genSpikes(1, 1, false, lastTileEnd.copy().add((13 + 16 * num) * tileWidth, -0.5 * tileWidth));
+          genSafezone(5, lastTileEnd.copy().add((12 + 16 * num) * tileWidth, 0), false);
+          
         }
+        break;
+      case 5: // multiple paths
+        genSafezone(5, lastTileEnd.copy().add(0, -tileWidth), true);
+        genSafezone(50, lastTileEnd.copy(), true);
+        break;
+        
+      
+        
+        
     }
   }
 
@@ -293,7 +316,7 @@ class Chunk {
   }
   
   void genPlat(int numTiles, PVector start, boolean willHaveJumpPad, int spikeOrient, boolean isMidair) {
-    if (! isMidair && start.y != baseElev) {
+    if (! isMidair && terrain.get(terrain.size() - 1).start.y != start.y && start.y != baseElev) {
       walls.add(new Wall(new PVector(start.x, baseElev), abs(start.y - baseElev))); 
     }
     for (int tile = 0; tile < numTiles; tile++) {
