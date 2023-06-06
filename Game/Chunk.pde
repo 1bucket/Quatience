@@ -12,12 +12,12 @@ class Chunk {
       easyChance = 0;
       medChance = 100;
       //easyChance = 0;
-      //medChance = 0;
+      medChance = 0;
       willGenCoin = true;
       
       // real chances
-      easyChance = 80;
-      medChance = 20;
+      //easyChance = 80;
+      //medChance = 20;
       //hardChance = 0;
       //willGenCoin = (int) (Math.random() * 100) < 7;
       /** variable hardChance is not used but is kept
