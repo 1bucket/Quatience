@@ -1,4 +1,4 @@
-class Structure {
+class Displayable {
   private PVector pos;
   
   public Structure(PVector setPos) {
