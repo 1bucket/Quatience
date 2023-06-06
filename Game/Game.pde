@@ -80,9 +80,9 @@ void newGame(boolean withMainMenu) {
   
   tileWidth = width / 40;
   baseElev = height * 3 / 4;
-  orbRadius = 20;
+  orbRadius = (int) (2.0 / 3.0 * tileWidth);
   
-  coinRadius = 30;
+  coinRadius = tileWidth;
   coins = new ArrayList<Coin>();
   //coins.add(new Coin(new PVector(width / 2, 0.55 * height)));
   
