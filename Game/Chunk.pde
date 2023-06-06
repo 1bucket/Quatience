@@ -11,13 +11,13 @@ class Chunk {
       // test probabilities
       easyChance = 0;
       medChance = 100;
-      //easyChance = 0;
+      //easyChance = 100;
       //medChance = 0;
       willGenCoin = true;
       
       // real chances
-      easyChance = 80;
-      medChance = 20;
+      //easyChance = 80;
+      //medChance = 20;
       //hardChance = 0;
       //willGenCoin = (int) (Math.random() * 100) < 7;
       /** variable hardChance is not used but is kept
@@ -45,7 +45,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    randChunk = 11;
+    randChunk = 10;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -128,7 +128,7 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    randChunk = 5;
+    randChunk = 10;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -229,7 +229,7 @@ class Chunk {
         genSafezone(1, lastTileEnd.copy().add(3 * tileWidth, -4 * tileWidth), true);
         genPlat(1, lastTileEnd.copy().add(4 * tileWidth, -4 * tileWidth), true, 0, true);
         genSafezone(1, lastTileEnd.copy().add(5 * tileWidth, -4 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(10 * tileWidth, -8 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(9 * tileWidth, -8 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(15 * tileWidth, -7 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(20 * tileWidth, -6 * tileWidth), true);
         if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(24 * tileWidth, -11 * tileWidth)));

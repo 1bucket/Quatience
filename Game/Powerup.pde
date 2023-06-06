@@ -1,5 +1,5 @@
 static final int INVINCIBLE = 0;
-static final int DOUBLE_JUMP = 0;
+static final int DOUBLE_JUMP = 1;
 static int powerupRadius;
 
 class Powerup extends Displayable {

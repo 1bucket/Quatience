@@ -29,6 +29,7 @@ String quitGame;
 ArrayList<Button> buttons;
 
 Player p;
+int doubleJumps;
 boolean canJump;
 color pCol;
 color themeColor;
@@ -42,6 +43,9 @@ ArrayList<Wall> walls;
 ArrayList<JumpOrb> jumpOrbs;
 ArrayList<PVector> rectPoints;
 ArrayList<Coin> coins;
+ArrayList<Powerup> powerups;
+int invTimer;
+int doubleJTimer;
 int rWidth;
 LandTile startTile;
 LandTile testTile;
@@ -80,15 +84,21 @@ void newGame(boolean withMainMenu) {
   
   tileWidth = width / 40;
   baseElev = height * 3 / 4;
-  orbRadius = 20;
+  orbRadius = (int) (2.0 / 3 * tileWidth);
   
-  coinRadius = 30;
+  coinRadius = tileWidth;
   coins = new ArrayList<Coin>();
   //coins.add(new Coin(new PVector(width / 2, 0.55 * height)));
+  
+  powerupRadius = (int) (0.75 * tileWidth);
+  powerups = new ArrayList<Powerup>();
+  powerups.add(new Powerup(new PVector(width / 2, height * 0.65), DOUBLE_JUMP));
+  
   
   //pCol = color(32, 129, 255);
   pCol = color(0, 255, 246);
   canJump = true;
+  doubleJumps = 0;
   
   // for animation
   opacity = 256;
@@ -158,6 +168,14 @@ void drawPlayer() {
   else {
     stroke(pCol);
     strokeWeight(1.5);
+    if (p.isInvincible && frameCount % 30 < 15) {
+      fill(233, 0, 0, 120);
+      stroke(233, 0, 0);
+    }
+    if (p.doubleJump && frameCount % 20 < 10) {
+      fill(106, 255, 33, 120);
+      stroke(106, 255, 33);
+    }
     PVector[] corners = p.getCorners();
     quad(corners[0].x, corners[0].y, corners[1].x, corners[1].y,
          corners[2].x, corners[2].y, corners[3].x, corners[3].y);
@@ -273,7 +291,7 @@ void drawUnderground() {
 
 void drawCoins() {
   stroke(0);
-  strokeWeight(1);
+  strokeWeight(2);
   fill(255, 217, 0);
   for (Coin coin : coins) {
     PVector pos = coin.getPos();
@@ -293,7 +311,6 @@ void newMainMenu() {
 
 void drawMainMenu() {
   PFont font = createFont("ChalkboardSE-Regular", 100);
-  stroke(themeColor);
   fill(0);
   textFont(font);
   textAlign(CENTER);
@@ -307,8 +324,25 @@ void drawMainMenu() {
   
 }
 
+void drawPowerups() {
+  stroke(0);
+  strokeWeight(2);
+  for (Powerup powerup : powerups) {
+    int powerupVar = powerup.getPowerVar();
+    if (powerupVar == INVINCIBLE) {
+      fill(233, 0, 0);
+    }
+    else if (powerupVar == DOUBLE_JUMP) {
+      fill(106, 255, 33);
+    }
+    if (frameCount % 20 < 10) fill(255);
+    PVector powerupPos = powerup.getPos();
+    circle(powerupPos.x, powerupPos.y, 2 * powerupRadius);
+  }
+}
+
 void draw() {
-  //System.out.println(terrain.size());
+  //System.out.println(doubleJumps);
   //System.out.println("p" + p.getCenter());
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
   
@@ -324,12 +358,29 @@ void draw() {
   drawOrbs();
   drawCoins();
   drawPlayer();
+  drawPowerups();
+  runPowerupTimer();
   displayAllButtons();
   activateButton();
   
   
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
+}
+
+void runPowerupTimer() {
+  if (frameCount % 60 == 0) {
+    if (invTimer > 0) {
+      p.isInvincible = true;
+      invTimer--;
+    }
+    else p.isInvincible = false;
+    if (doubleJTimer > 0) {
+      p.doubleJump = true;
+      doubleJTimer--;
+    }
+    else p.doubleJump = false;
+  }
 }
 
 void movePlayer() {
@@ -340,6 +391,7 @@ void movePlayer() {
   for (JumpOrb orb : jumpOrbs) orb.shift(p.getSpdX());
   for (PVector rectCorn : rectPoints) rectCorn.add(- p.getSpdX(), 0);
   for (Coin coin : coins) coin.shift(p.getSpdX());
+  for (Powerup powerup : powerups) powerup.shift(p.getSpdX());
   
   
   if (walls.size() > 0) {
@@ -371,6 +423,14 @@ void movePlayer() {
     for (int index = 0; index < coins.size(); index++) {
       if (coins.get(index).getPos().x < -coinRadius) {
         coins.remove(index--);
+      }
+    }
+  }
+  
+  if (powerups.size() > 0) {
+    for (int index = 0; index < powerups.size(); index++) {
+      if (powerups.get(index).getPos().x < -powerupRadius) {
+        powerups.remove(index--);
       }
     }
   }
@@ -427,6 +487,21 @@ void checkCollision() {
         coins.remove(index--);
       }
     }
+    
+    // obtaining powerups
+    for (int index = 0; index < powerups.size(); index++) {
+      Powerup powerup = powerups.get(index);
+      if (corner.dist(powerup.getPos()) < powerupRadius) {
+        int powerupVar = powerup.getPowerVar();
+        if (powerupVar == INVINCIBLE) {
+          invTimer = 30;
+        }
+        else if (powerupVar == DOUBLE_JUMP) {
+          doubleJTimer = 30;
+        }
+        powerups.remove(index--);
+      }
+    }
         
     
     // wall collision
@@ -434,8 +509,15 @@ void checkCollision() {
       PVector wallPos = wall.getPos();
       if (pCenter.x < wallPos.x &&
           numInRange(corner.x, wallPos.x, wallPos.x + tileWidth) && 
-          numInRange(corner.y, wall.getTopElev(), wallPos.y))
-        endGame();
+          numInRange(corner.y, wall.getTopElev(), wallPos.y)) {
+            if (p.isInvincible) {
+              p.getCenter().add(0,-8 * tileWidth);
+            }
+            else {
+              endGame();
+            }
+          }
+        
     }
     
     
@@ -448,7 +530,14 @@ void checkCollision() {
       PVector apex = tileUnder.getObsApex();
       PVector endPt = corner.x > tileUnder.start.x + tileWidth / 2 ? tileUnder.end : tileUnder.start;
       Line obsSurface = new Line(apex, endPt);
-      if (obsSurface.output(corner.x) - corner.y <= 0 && pCenter.y < tileUnder.start.y) endGame();            
+      if (obsSurface.output(corner.x) - corner.y <= 0 && pCenter.y < tileUnder.start.y) {
+        if (p.isInvincible) {
+          p.jump(MAJOR);
+        }
+        else {
+          endGame();
+        }
+      }
     }
     
     // ceiliing collision detection
@@ -458,10 +547,22 @@ void checkCollision() {
         PVector apex = tileAbove.getObsApex();
         PVector endPt = corner.x > tileAbove.start.x + tileWidth / 2  ? tileAbove.end.copy().add(0, 5) : tileAbove.start.copy().add(0, 5);
         Line obsSurface = new Line(apex, endPt);
-        if (corner.y - obsSurface.output(corner.x) <= 0 && pCenter.y > tileAbove.start.y + 5) endGame();
+        if (corner.y - obsSurface.output(corner.x) <= 0 && pCenter.y > tileAbove.start.y + 5) {
+          if (p.isInvincible) {
+            p.setSpdY(abs(p.getSpdY()) * -1);
+          }
+          else {
+            endGame();
+          }
+        }
       }
       else if (corner.y <= tileAbove.start.y + 5 && pCenter.y > tileAbove.start.y + 5) {
-        endGame();
+        if (p.isInvincible) {
+          p.setSpdY(abs(p.getSpdY()) * -1);
+        }
+        else {
+          endGame();
+        }
       }
     }
     
@@ -482,6 +583,7 @@ void checkCollision() {
     p.setSpdY(0);
     if (grounded == 2) {
       pCenter.set(pCenter.x, tileBelow(pCenter).start.y - tileWidth / 2);
+      doubleJumps = 0;
     }
     canJump = true;
   }
@@ -595,9 +697,13 @@ void keyPressed() {
     if (checkOrbCollision()) p.jump(MINOR);
     if (canJump) {
       p.jump(NORMAL);
-      canJump = false;
     }
-    //else if (checkOrbCollision()) p.jump(MINOR);
+    else if (checkOrbCollision()) p.jump(MINOR);
+    else if (p.doubleJump && doubleJumps < 1) {
+      p.jump(NORMAL);
+      doubleJumps++;
+    }
+    
   }
   if (key == 'a') {
     newGame(false);
