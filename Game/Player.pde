@@ -63,25 +63,11 @@ class Player {
     }
     return corners;
   }
-  
-  //// for character rendering purposes
-  //public PVector[] innerCorners() {
-  //  PVector[] innerCorners = new PVector[4];
-  //  for (int index = 0; index < innerCorners.length; index++) {
-  //    float trueAng = rotAng + index * PI / 2;
-  //    float cornerX = center.x + (tileWidth / 2 / sqrt(2) * cos(trueAng));
-  //    float cornerY = center.y + (tileWidth / 2 / sqrt(2) * sin(trueAng));
-  //    innerCorners[index] = new PVector(cornerX, cornerY); 
-  //  }
-  //  return innerCorners;
-  //}
-  
+
   public void jump(int boost) {
     //System.out.println(boosted);
-    if (boost == NORMAL) speedy = 12;
-    else if (boost == MINOR) speedy = 14;
-    else if (boost == MAJOR) speedy = 18;
-  }
-   //<>// //<>//
-  
+    if (boost == NORMAL) speedy = 0.4 * tileWidth;
+    else if (boost == MINOR) speedy = 14 / 30 * tileWidth;
+    else if (boost == MAJOR) speedy = 0.6 * tileWidth;
+  } //<>//
 }

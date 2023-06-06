@@ -1,20 +1,25 @@
 
 class Chunk {
+  boolean willGenCoin;
+  
   void genChunk() {
     int rand = (int) (Math.random() * 100);
+    
     int easyChance, medChance;
     //difficulty = DIFFICULT;
     if (difficulty == EASY) {
       // test probabilities
-      easyChance = 100;
-      medChance = 0;
       easyChance = 0;
+      medChance = 100;
+      //easyChance = 0;
       medChance = 0;
+      willGenCoin = true;
       
       // real chances
       //easyChance = 80;
       //medChance = 20;
       //hardChance = 0;
+      //willGenCoin = (int) (Math.random() * 100) < 7;
       /** variable hardChance is not used but is kept
        and commented out as a reference */
     } else if (difficulty == MEDIUM) {
@@ -40,7 +45,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    //randChunk = 5;
+    randChunk = 11;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -71,14 +76,15 @@ class Chunk {
         PVector midairStart = start.copy().add(0, -sqrt(3) / 2 * tileWidth);
         terrain.add(new LandTile(midairStart, midairStart.copy().add(tileWidth, 0), false, 0, true));
         terrain.add(new LandTile(start, end, false, 1, false));
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(4 * tileWidth, -5 * tileWidth))); 
         break;
-      case 6: // 5 spikes + platforms over 2nd-4th spikes ** needs fixing
+      case 6: // 5 spikes + platforms over 2nd-4th spikes
         genSpikes(5, 1, false, lastTileEnd);
         PVector platStart = lastTile.end.copy().add(tileWidth, - tileWidth);
         genSafezone(3, platStart, true);
         genSafezone(4, lastTileEnd, false);
         break;
-      case 7: // 4 midair spikes
+      case 7: // 4 midair upward spikes
         genSpikes(4, 1, true, lastTileEnd.copy().add(0, -tileWidth));
         genSafezone(4, lastTileEnd, false);
         break;
@@ -110,17 +116,19 @@ class Chunk {
         genSafezone(4, lastTileEnd.copy().add(4 * tileWidth, -2 * tileWidth), true);
         genSpikes(1, 1, true, lastTileEnd.copy().add(8 * tileWidth, -1.5 * tileWidth));
         genSafezone(8, lastTileEnd.copy().add(tileWidth, 0), false);
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(6 * tileWidth, -tileWidth)));
         break;
       case 11: // 4x1 hanging spikes
         genSpikes(4, 2, true, lastTileEnd.copy().add(0, -tileWidth));
         genSafezone(4, lastTileEnd.copy(), false);
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(6 * tileWidth, -6 * tileWidth)));
         break;
       }
   }
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    //randChunk = 10;
+    randChunk = 5;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -168,8 +176,16 @@ class Chunk {
           jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(tileWidth / 2 + orbs * 3.5 * tileWidth, (-2 + -3 * orbs) * tileWidth)));
         }
         genSpikes(10, 1, false, lastTileEnd.copy());
-        walls.add(new Wall(lastTileEnd.copy().add(10 * tileWidth, 0), 9 * tileWidth));
-        genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, -9 * tileWidth), false);
+        if (willGenCoin) {
+          genSpikes(4, 2, true, lastTileEnd.copy().add(10 * tileWidth, -9 * tileWidth));
+          genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, -5 * tileWidth), false);
+          walls.add(new Wall(lastTileEnd.copy().add(10 * tileWidth, 0), 5 * tileWidth));
+          coins.add(new Coin(lastTileEnd.copy().add(12 * tileWidth, -6.5 * tileWidth)));
+        }
+        else {
+          walls.add(new Wall(lastTileEnd.copy().add(10 * tileWidth, 0), 9 * tileWidth));
+          genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, -9 * tileWidth), false);
+        }
         genSafezone(4, lastTileEnd.copy().add(10 * tileWidth, 0), false);
         break;
       case 6: // varying-elev platforms over 40 spikes
@@ -216,6 +232,7 @@ class Chunk {
         genSafezone(3, lastTileEnd.copy().add(10 * tileWidth, -8 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(15 * tileWidth, -7 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(20 * tileWidth, -6 * tileWidth), true);
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(24 * tileWidth, -11 * tileWidth)));
         genSafezone(3, lastTileEnd.copy().add(25 * tileWidth, -5 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(30 * tileWidth, -4 * tileWidth), true);
         genSpikes(1, 1, true, lastTileEnd.copy().add(35 * tileWidth, -3 * tileWidth));
@@ -278,8 +295,30 @@ class Chunk {
         }
         break;
       case 5: // multiple paths
-        genSafezone(5, lastTileEnd.copy().add(0, -tileWidth), true);
-        genSafezone(50, lastTileEnd.copy(), true);
+        genSpikes(1, 1, false, lastTileEnd.copy());
+        genSafezone(3, lastTileEnd.copy().add(0, -tileWidth), true);
+        genPlat(1, lastTileEnd.copy().add(3 * tileWidth, -tileWidth), true, 0, true);
+        genSafezone(5, lastTileEnd.copy().add(4 * tileWidth, -tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(6.5 * tileWidth, -5 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(10.5 * tileWidth, -7 * tileWidth), true);
+        genSpikes(1, 1, true, lastTileEnd.copy().add(14.5 * tileWidth, -7 * tileWidth));
+        genSafezone(2, lastTileEnd.copy().add(17.5 * tileWidth, -6 * tileWidth), true);
+        genSpikes(1, 1, false, lastTileEnd.copy().add(9 * tileWidth, -2 * tileWidth));
+        genSpikes(1, 1, true, lastTileEnd.copy().add(10 * tileWidth, -tileWidth));
+        genSafezone(4, lastTileEnd.copy().add(11 * tileWidth, -tileWidth), true);
+        genSafezone(6, lastTileEnd.copy().add(15 * tileWidth, -3 * tileWidth), false);
+        walls.add(new Wall(lastTileEnd.copy().add(15 * tileWidth, -tileWidth), 2 * tileWidth));
+        
+        genSpikes(1, 2, true, lastTileEnd.copy().add(23 * tileWidth, -5 * tileWidth));
+        genSafezone(2, lastTileEnd.copy().add(24 * tileWidth, -5 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(21 * tileWidth, -tileWidth), false);
+        if (willGenCoin) {
+          int whichPos = (int) (Math.random() * 2);
+          PVector coinPos = whichPos == 0 ? lastTileEnd.copy().add(12.5 * tileWidth, -3.5 * tileWidth)
+                                          : lastTileEnd.copy().add(26 * tileWidth, -8 * tileWidth);
+          coins.add(new Coin(coinPos));
+        }
+        genSafezone(50, lastTileEnd.copy(), false);
         break;
         
       

@@ -6,6 +6,26 @@ final int DIFFICULT = 2;
 int score = 0;
 int baseElev;
 boolean gameOver;
+String splash;
+String[] splashText = new String[] {
+    "The game that waits for you to lose!",
+    "It's like that dinosaur game but harder",
+    //"Disclaimer: The music is not synced with the course",
+    "Play at your own risk!",
+    "If you've been playing too long, it might be time for a break",
+    "I did not need to try this hard making this game",
+    "Please tell me this game is good I spent a few too many hours on it",
+    "It's like that dinosaur game but without birds and with more cacti",
+    "Hint: The spikes are not friendly, and neither are walls",
+    "If it looks like a trap, it probably is",
+    "There is a fine line between ambition and greed",
+    "Watch out!",
+    "Hello Brian",
+    "Splash text not inspired by Minecraft I swear"
+};
+boolean isInMainMenu;
+String startGame;
+String quitGame;
 ArrayList<Button> buttons;
 
 Player p;
@@ -13,7 +33,6 @@ boolean canJump;
 color pCol;
 color themeColor;
 int lineWeight;
-int curSpd;
 int exploSize;
 int opacity;
 
@@ -22,14 +41,16 @@ ArrayList<LandTile> terrain;
 ArrayList<Wall> walls;
 ArrayList<JumpOrb> jumpOrbs;
 ArrayList<PVector> rectPoints;
+ArrayList<Coin> coins;
 int rWidth;
 LandTile startTile;
 LandTile testTile;
 
 void setup() {
+  fullScreen();
+  newGame(true);
   
-  size(1200, 600);
-  newGame(); 
+   
   //frameRate(60);
   //Line test1 = new Line(2, 0);
   //Line test3 = new Line(new PVector(1, 2), new PVector(0, 1));
@@ -41,13 +62,16 @@ void setup() {
   //drawUnderground();
 }
 
-void newGame() {
+void newGame(boolean withMainMenu) {
   
   gameOver = false;
   pause = false;
   score = 0;
   difficulty = EASY;
   pause = false;
+  isInMainMenu = withMainMenu;
+  
+  
   
   //themeColor = color(132, 0, 218);
   themeColor = color(0, 15, 221);
@@ -56,14 +80,17 @@ void newGame() {
   
   tileWidth = width / 40;
   baseElev = height * 3 / 4;
-  radius = 20;
+  orbRadius = 20;
+  
+  coinRadius = 30;
+  coins = new ArrayList<Coin>();
+  //coins.add(new Coin(new PVector(width / 2, 0.55 * height)));
   
   //pCol = color(32, 129, 255);
   pCol = color(0, 255, 246);
-  curSpd = 6;
   canJump = true;
   
-  // for death animation
+  // for animation
   opacity = 256;
   exploSize = (int) (tileWidth * sqrt(2));
   
@@ -101,8 +128,10 @@ void newGame() {
   //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
   //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
 
-  p = new Player(new PVector(180, baseElev - tileWidth / 2), curSpd);
+  p = new Player(new PVector(180, baseElev - tileWidth / 2), width / 200);
   //stroke(0, 0, 0);
+  
+  if (withMainMenu) newMainMenu();
   
 }
 
@@ -112,7 +141,7 @@ void drawOrbs() {
   for (JumpOrb orb : jumpOrbs) {
     //System.out.println("hello");
     PVector pos = orb.getPos();
-    circle(pos.x, pos.y, radius * 2);
+    circle(pos.x, pos.y, orbRadius * 2);
   }
 }
 
@@ -217,10 +246,18 @@ void displayAllButtons() {
 void activateButton() {
   for (Button button : buttons)  {
     if (mousePressed & button.isMouseOnButton()) {
-      if (button.getText().equals("Resume")) 
+      String bText = button.getText();
+      if (bText.equals("Resume")) 
         resumeGame();
-      else if (button.getText().equals("Restart")) {
-        newGame();
+      else if (bText.equals("Restart")) {
+        newGame(false);
+      }
+      else if (bText.equals("Start Game") || bText.equals("Start Suffering")) {
+        isInMainMenu = false;
+        buttons = new ArrayList<Button>();
+      }
+      else if (bText.equals("Quit")) {
+        exit();
       }
     }
   }
@@ -234,23 +271,62 @@ void drawUnderground() {
   }
 }
 
+void drawCoins() {
+  stroke(0);
+  strokeWeight(1);
+  fill(255, 217, 0);
+  for (Coin coin : coins) {
+    PVector pos = coin.getPos();
+    ellipse(pos.x, pos.y, 2 * coinRadius * sin(PI / 45 * frameCount), 2 * coinRadius);
+  }
+}
+
+void newMainMenu() {
+  splash = splashText[(int) (Math.random() * splashText.length)];
+  startGame = Math.random() > 0.2 ? "Start Game" : "Start Suffering";
+  quitGame = Math.random() > 0.2 ? "Quit" : "Rage quit";
+  
+  PVector midpt = new PVector(width / 2, height * 0.65);
+  buttons.add(new Button(midpt.copy().add(-200, 0), startGame, 225, 80));
+  buttons.add(new Button(midpt.copy().add(200, 0), quitGame, 225, 80));
+}
+
+void drawMainMenu() {
+  PFont font = createFont("ChalkboardSE-Regular", 100);
+  stroke(themeColor);
+  fill(0);
+  textFont(font);
+  textAlign(CENTER);
+  
+  text("Geometry Dash Infinite", width / 2, height * 2 / 5);
+  
+  textSize(5 * abs(sin(PI / 45 * frameCount)) + 30);
+  text(splash, width / 2, height * 0.5);
+  
+  //circle(midpt.x, midpt.y, 12);
+  
+}
+
 void draw() {
-  System.out.println(canJump);
   //System.out.println(terrain.size());
   //System.out.println("p" + p.getCenter());
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
+  
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
+  if (isInMainMenu) drawMainMenu();
   if (! gameOver && ! pause) {
-    score++;
+    if (! isInMainMenu) score++;
     movePlayer();
   }
-  displayScore();
+  if (! isInMainMenu) displayScore();
   drawTerrain();
   drawUnderground();
   drawOrbs();
+  drawCoins();
   drawPlayer();
   displayAllButtons();
   activateButton();
+  
   
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
@@ -263,6 +339,7 @@ void movePlayer() {
   for (Wall wall : walls) wall.shift(p.getSpdX());
   for (JumpOrb orb : jumpOrbs) orb.shift(p.getSpdX());
   for (PVector rectCorn : rectPoints) rectCorn.add(- p.getSpdX(), 0);
+  for (Coin coin : coins) coin.shift(p.getSpdX());
   
   
   if (walls.size() > 0) {
@@ -276,7 +353,7 @@ void movePlayer() {
   
   if (jumpOrbs.size() > 0) {
     for (int index = 0; index < jumpOrbs.size(); index++) {
-      if (jumpOrbs.get(index).getPos().x + radius < 0) {
+      if (jumpOrbs.get(index).getPos().x + orbRadius < 0) {
         jumpOrbs.remove(index--);
       }
     }
@@ -290,14 +367,28 @@ void movePlayer() {
     }
   }
   
+  if (coins.size() > 0) {
+    for (int index = 0; index < coins.size(); index++) {
+      if (coins.get(index).getPos().x < -coinRadius) {
+        coins.remove(index--);
+      }
+    }
+  }
+  
   LandTile curTile = terrain.get(0);
   if (curTile.end.x < -5) terrain.remove(curTile);
   LandTile lastTile = terrain.get(terrain.size() - 1);
   
   // continuously generate new terrain as the game runs
   // filler random chunk generator
-  if (terrain.get(terrain.size() - 1).end.x < width) {
-    gen.genChunk();
+  if (lastTile.end.x < width) {
+    if (isInMainMenu) {
+      PVector start = lastTile.end.copy();
+      terrain.add(new LandTile(start, start.copy().add(width, 0), false, 0, false));
+    }
+    else {
+      gen.genChunk();
+    }
     //boolean willHaveObs = Math.random() < 0.1 ? true : false;
     //willHaveObs = false;
     //LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, baseElev), 
@@ -328,6 +419,15 @@ void checkCollision() {
   // collisions against ground and obstacles
   int grounded = 0;
   for (PVector corner : corners) {
+    
+    // obtaining coins
+    for (int index = 0; index < coins.size(); index++) {
+      if (corner.dist(coins.get(index).getPos()) < coinRadius) {
+        score += 500;
+        coins.remove(index--);
+      }
+    }
+        
     
     // wall collision
     for (Wall wall : walls) {
@@ -393,7 +493,7 @@ void checkCollision() {
 }
 
 void gravity() {
-  p.setSpdY(p.getSpdY() - 1);
+  p.setSpdY(p.getSpdY() - (1 / 30.0 * tileWidth));
 }
 
 LandTile tileBelow(PVector point) {
@@ -429,7 +529,7 @@ LandTile tileAbove(PVector point) {
 boolean checkOrbCollision() {
   PVector pCenter = p.getCenter();
   for (JumpOrb orb : jumpOrbs) {
-    if (pCenter.dist(orb.getPos()) < radius + 20) {
+    if (pCenter.dist(orb.getPos()) < orbRadius + 20) {
       return true;
     }
   }
@@ -499,10 +599,9 @@ void keyPressed() {
     }
     //else if (checkOrbCollision()) p.jump(MINOR);
   }
-  if (gameOver && key == 'a') {
-    newGame();
+  if (key == 'a') {
+    newGame(false);
   }
-  if (key == 'r' && pause) newGame();
   if (key == 'q' && ! gameOver) {
     if (pause) resumeGame();
     else pauseGame();

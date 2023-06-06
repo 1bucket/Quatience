@@ -1,4 +1,4 @@
-static int radius;
+static int orbRadius;
 
 class JumpOrb extends Structure {
   

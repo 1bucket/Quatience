@@ -12,7 +12,10 @@ class Button extends Structure{
   
   public void displayButton() {
     //rectMode(CENTER);
-    fill(74, 153, 255);
+    stroke(0);
+    color bColor = isMouseOnButton() ? color(red(themeColor) + 86, green(themeColor) + 152, blue(themeColor) + 34) 
+                                     : color(red(themeColor) + 14, green(themeColor) + 34, blue(themeColor) + 34);
+    fill(bColor);
     rect(getPos().x - bWidth / 2, getPos().y - bHeight / 2, bWidth, bHeight);
     fill(0, 0, 0);
     textSize(30);
