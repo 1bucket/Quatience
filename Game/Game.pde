@@ -31,6 +31,7 @@ ArrayList<Button> buttons;
 Player p;
 int doubleJumps;
 boolean canJump;
+ArrayList<PVector> trail;
 color pCol;
 color themeColor;
 int lineWeight;
@@ -90,9 +91,12 @@ void newGame(boolean withMainMenu) {
   coins = new ArrayList<Coin>();
   //coins.add(new Coin(new PVector(width / 2, 0.55 * height)));
   
-  powerupRadius = (int) (0.75 * tileWidth);
+  powerupRadius = (int) (0.5 * tileWidth);
   powerups = new ArrayList<Powerup>();
   powerups.add(new Powerup(new PVector(width / 2, height * 0.65), DOUBLE_JUMP));
+  invTimer = 0;
+  doubleJTimer = 0;
+  trail = new ArrayList<PVector>();
   
   
   //pCol = color(32, 129, 255);
@@ -166,15 +170,28 @@ void drawPlayer() {
     circle(p.getCenter().x, p.getCenter().y, exploSize += 5);
   }
   else {
-    stroke(pCol);
+    if (p.doubleJump) {
+      trail.add(p.getCenter().copy());
+      //stroke(106, 255, 33);
+    }
+    // trail, if applicable
+    fill(106, 255, 33);
+    noStroke();
+    for (int index = 0; index < trail.size(); index++) {
+      PVector trailPt = trail.get(index); 
+      if (trailPt.x < 2 * tileWidth) {
+        trail.remove(index--);
+      }
+      else {
+        circle(trailPt.x, trailPt.y, tileWidth);
+      }
+    }
+    fill(0);
+    stroke(p.doubleJump ? color(106, 255, 33) : pCol);
     strokeWeight(1.5);
     if (p.isInvincible && frameCount % 30 < 15) {
-      fill(233, 0, 0, 120);
-      stroke(233, 0, 0);
-    }
-    if (p.doubleJump && frameCount % 20 < 10) {
-      fill(106, 255, 33, 120);
-      stroke(106, 255, 33);
+      fill(116, 0, 0);
+      stroke(170, 0, 0);
     }
     PVector[] corners = p.getCorners();
     quad(corners[0].x, corners[0].y, corners[1].x, corners[1].y,
@@ -255,6 +272,23 @@ void displayScore() {
   textSize(40);
   textAlign(CENTER);
   text(score, width / 2, 40);
+}
+
+void displayBuffs() {
+  ArrayList<String> buffs = new ArrayList<String>();
+  if (invTimer > 0) {
+    buffs.add("Invincibility: " + invTimer);
+  }
+  if (doubleJTimer > 0) {
+    buffs.add("Double Jump: " + doubleJTimer);
+  }
+  PFont font = createFont("ChalkboardSE-Regular", 50);
+  textFont(font);
+  textAlign(LEFT);
+  fill(pCol);
+  for (int index = 0; index < buffs.size(); index++) {
+    text(buffs.get(index), 10, (index + 1) * 50);
+  }
 }
 
 void displayAllButtons() {
@@ -359,6 +393,7 @@ void draw() {
   drawCoins();
   drawPlayer();
   drawPowerups();
+  displayBuffs();
   runPowerupTimer();
   displayAllButtons();
   activateButton();
@@ -369,17 +404,15 @@ void draw() {
 }
 
 void runPowerupTimer() {
+  p.isInvincible = invTimer > 0;
+  p.doubleJump = doubleJTimer > 0;
   if (frameCount % 60 == 0) {
     if (invTimer > 0) {
-      p.isInvincible = true;
       invTimer--;
     }
-    else p.isInvincible = false;
     if (doubleJTimer > 0) {
-      p.doubleJump = true;
       doubleJTimer--;
     }
-    else p.doubleJump = false;
   }
 }
 
@@ -392,6 +425,7 @@ void movePlayer() {
   for (PVector rectCorn : rectPoints) rectCorn.add(- p.getSpdX(), 0);
   for (Coin coin : coins) coin.shift(p.getSpdX());
   for (Powerup powerup : powerups) powerup.shift(p.getSpdX());
+  for (PVector trailPt : trail) trailPt.add(-p.getSpdX(), 0);
   
   
   if (walls.size() > 0) {
@@ -440,7 +474,6 @@ void movePlayer() {
   LandTile lastTile = terrain.get(terrain.size() - 1);
   
   // continuously generate new terrain as the game runs
-  // filler random chunk generator
   if (lastTile.end.x < width) {
     if (isInMainMenu) {
       PVector start = lastTile.end.copy();
@@ -449,12 +482,9 @@ void movePlayer() {
     else {
       gen.genChunk();
     }
-    //boolean willHaveObs = Math.random() < 0.1 ? true : false;
-    //willHaveObs = false;
-    //LandTile next = new LandTile(lastTile.end.copy().set(lastTile.end.x, baseElev), 
-    //                             lastTile.end.copy().set(lastTile.end.x + tileWidth, baseElev), 
-    //                             false, willHaveObs ? 1 : 0, false);
-    //terrain.add(next);
+    if (Math.random() < 0.5) {
+      gen.genPowerup((int) Math.random() * 2);
+    }
   }
   
   while (rectPoints.size() < 12) {
@@ -491,7 +521,7 @@ void checkCollision() {
     // obtaining powerups
     for (int index = 0; index < powerups.size(); index++) {
       Powerup powerup = powerups.get(index);
-      if (corner.dist(powerup.getPos()) < powerupRadius) {
+      if (corner.dist(powerup.getPos()) < powerupRadius + 15) {
         int powerupVar = powerup.getPowerVar();
         if (powerupVar == INVINCIBLE) {
           invTimer = 30;

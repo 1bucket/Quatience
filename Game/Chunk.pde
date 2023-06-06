@@ -369,4 +369,17 @@ class Chunk {
     //LandTile lastTile = terrain.get(terrain.size() - 1);
     genPlat(spikes, spikeStart, false, spikeOrient, isMidair );
   }
+  
+  void genPowerup(int powerVar) {
+    ArrayList<LandTile> cands = new ArrayList<LandTile>();
+    for (int index = terrain.size() - 1; index >= 0 && terrain.get(index).start.x > width; index--) {
+      LandTile cand = terrain.get(index);
+      LandTile aboveTile = tileAbove(cand.start.copy().add(tileWidth / 2, 0));
+      if (cand.getObsStatus() == 0 && (aboveTile == null || aboveTile.isMidair)) cands.add(cand); 
+    }
+    if (cands.size() > 0) {
+      LandTile chosen = cands.get((int) (Math.random() * cands.size()));
+      powerups.add(new Powerup(chosen.start.copy().add(tileWidth / 2, -powerupRadius), powerVar));
+    }
+  }
 }
