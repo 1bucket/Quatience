@@ -3,7 +3,7 @@ static final int NONE = 0;
 static final int ABOVE = 1;
 static final int BELOW = 2;
 
-class LandTile extends Structure {
+class LandTile extends Displayable {
   PVector start, end;
   //boolean hasObstacle;
   private boolean hasJumpPad;

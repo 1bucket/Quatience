@@ -1,4 +1,4 @@
-class Wall extends Structure {
+class Wall extends Displayable {
   //private PVector pos; // the position of the foot of the wall
   private float wallH;
   //private boolean canHit;

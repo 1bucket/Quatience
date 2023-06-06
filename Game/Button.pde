@@ -1,4 +1,4 @@
-class Button extends Structure{
+class Button extends Displayable{
   private String text;
   private int bWidth, bHeight;
   
