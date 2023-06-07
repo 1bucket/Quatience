@@ -57,6 +57,7 @@ LandTile startTile;
 LandTile testTile;
 
 void setup() {
+  for (String font : PFont.list()) println(font);
   fullScreen();
   newGame(true, true);
   
