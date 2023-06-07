@@ -11,8 +11,8 @@ class Chunk {
       // test probabilities
       easyChance = 0;
       medChance = 100;
-      easyChance = 100;
-      medChance = 0;
+      //easyChance = 100;
+      //medChance = 0;
       willGenCoin = true;
       
       // real chances
@@ -45,7 +45,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    randChunk = 11;
+    //randChunk = 11;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -128,7 +128,7 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    randChunk = 2;
+    randChunk = 6;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -190,6 +190,7 @@ class Chunk {
         break;
       case 6: // varying-elev platforms over 40 spikes
         genSafezone(4, lastTileEnd.copy().add(0, -tileWidth), false);
+        genSafezone(4, lastTileEnd.copy(), false);
         genSafezone(3, lastTileEnd.copy().add(7 * tileWidth, -1.5  *tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(14 * tileWidth, -2 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(21 * tileWidth, -3 * tileWidth), true);
@@ -245,7 +246,7 @@ class Chunk {
 
   void genHardChunk() {
     int randChunk = (int) (Math.random() * 3);
-    randChunk = 5;
+    //randChunk = 3;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -264,7 +265,8 @@ class Chunk {
         }
         break;
       case 2: // tunnel w/ 4 1x3 plat
-        genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        //genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        genSafezone(28, lastTileEnd.copy().add(0, -4 * tileWidth), true);
         for (int numRises = 0; numRises < 4; numRises++) {
           genSafezone(1, lastTileEnd.copy().add(9 * numRises * tileWidth, -2.5 * tileWidth), false);
           genSafezone(9, lastTileEnd.copy().add(9 * numRises * tileWidth, 0), false);

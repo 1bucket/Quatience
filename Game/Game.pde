@@ -3,6 +3,7 @@ int difficulty;
 final int EASY = 0;
 final int MEDIUM = 1;
 final int DIFFICULT = 2;
+boolean classicMode;
 int score = 0;
 int baseElev;
 boolean gameOver;
@@ -27,6 +28,8 @@ boolean isInMainMenu;
 String startGame;
 String quitGame;
 ArrayList<Button> buttons;
+int surviveTime;
+boolean isChoosingDiff;
 
 Player p;
 int doubleJumps;
@@ -53,7 +56,7 @@ LandTile testTile;
 
 void setup() {
   fullScreen();
-  newGame(true);
+  newGame(true, true);
   
    
   //frameRate(60);
@@ -67,7 +70,7 @@ void setup() {
   //drawUnderground();
 }
 
-void newGame(boolean withMainMenu) {
+void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   gameOver = false;
   pause = false;
@@ -76,6 +79,8 @@ void newGame(boolean withMainMenu) {
   pause = false;
   isInMainMenu = withMainMenu;
   
+  classicMode = willBeClassic;
+  if (classicMode && ! withMainMenu) surviveTime = 0;
   
   
   //themeColor = color(132, 0, 218);
@@ -302,10 +307,11 @@ void activateButton() {
       if (bText.equals("Resume")) 
         resumeGame();
       else if (bText.equals("Restart")) {
-        newGame(false);
+        newGame(false, classicMode);
       }
       else if (bText.equals("Start Game") || bText.equals("Start Suffering")) {
-        isInMainMenu = false;
+        //isInMainMenu = false;
+        isChoosingDiff = true;
         buttons = new ArrayList<Button>();
       }
       else if (bText.equals("Quit")) {
@@ -376,11 +382,12 @@ void drawPowerups() {
 }
 
 void draw() {
-  //System.out.println(doubleJumps);
+  //System.out.println((int) Math.random() * 2);
   //System.out.println("p" + p.getCenter());
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
   
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
+  text(difficulty, width / 2, height / 2);
   if (isInMainMenu) drawMainMenu();
   if (! gameOver && ! pause) {
     if (! isInMainMenu) score++;
@@ -395,12 +402,22 @@ void draw() {
   drawPowerups();
   displayBuffs();
   runPowerupTimer();
+  if (classicMode && ! pause && ! isInMainMenu) {
+    surviveTime++;
+    updateDifficulty();
+  }
   displayAllButtons();
   activateButton();
   
   
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
+}
+
+void updateDifficulty() {
+  float secondsAlive = surviveTime / 60.0;
+  if (secondsAlive == 45) difficulty = MEDIUM;
+  else if (secondsAlive == 120) difficulty = DIFFICULT;
 }
 
 void runPowerupTimer() {
@@ -483,7 +500,7 @@ void movePlayer() {
       gen.genChunk();
     }
     if (Math.random() < 0.5) {
-      gen.genPowerup((int) Math.random() * 2);
+      gen.genPowerup((int) random(0, 2));
     }
   }
   
@@ -744,10 +761,10 @@ void keyPressed() {
     }
     
   }
-  if (key == 'a') {
-    newGame(false);
+  if (key == 'a' && ! isInMainMenu) {
+    newGame(false, classicMode);
   }
-  if (key == 'q' && ! gameOver) {
+  if (key == 'q' && ! isInMainMenu && ! gameOver) {
     if (pause) resumeGame();
     else pauseGame();
   }
