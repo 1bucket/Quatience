@@ -487,7 +487,7 @@ void movePlayer() {
     }
   }
   
-  while (rectPoints.size() < width / (rWidth + 20)) {
+  while (rectPoints.size() <= width / (rWidth + 20)) {
     if (rectPoints.size() == 0) rectPoints.add(new PVector(0, baseElev + 20));
     else rectPoints.add(rectPoints.get(rectPoints.size() - 1).copy().add(rWidth + 20, 0));
   }
