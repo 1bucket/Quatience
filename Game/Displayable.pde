@@ -1,7 +1,7 @@
-class Structure {
+class Displayable {
   private PVector pos;
   
-  public Structure(PVector setPos) {
+  public Displayable(PVector setPos) {
     pos = setPos;
   }
   

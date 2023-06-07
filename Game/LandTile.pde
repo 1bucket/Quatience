@@ -3,7 +3,7 @@ static final int NONE = 0;
 static final int ABOVE = 1;
 static final int BELOW = 2;
 
-class LandTile extends Structure {
+class LandTile extends Displayable {
   PVector start, end;
   //boolean hasObstacle;
   private boolean hasJumpPad;
@@ -22,7 +22,9 @@ class LandTile extends Structure {
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
     this.isMidair = isMidair;
-    if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
+    //if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
+    LandTile tileBefore = tileBefore(this);
+    if (isMidair && tileBefore == null) { 
       walls.add(new Wall(start.copy().add(0, 10), 10));
       //walls.add(new Wall(end.copy().add(0, 10), 10));
     }

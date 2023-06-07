@@ -11,8 +11,13 @@ class Chunk {
       // test probabilities
       easyChance = 0;
       medChance = 100;
+<<<<<<< HEAD
       //easyChance = 0;
       medChance = 0;
+=======
+      //easyChance = 100;
+      //medChance = 0;
+>>>>>>> phase3
       willGenCoin = true;
       
       // real chances
@@ -45,7 +50,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    randChunk = 11;
+    //randChunk = 11;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -128,7 +133,7 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    randChunk = 5;
+    randChunk = 6;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -190,6 +195,7 @@ class Chunk {
         break;
       case 6: // varying-elev platforms over 40 spikes
         genSafezone(4, lastTileEnd.copy().add(0, -tileWidth), false);
+        genSafezone(4, lastTileEnd.copy(), false);
         genSafezone(3, lastTileEnd.copy().add(7 * tileWidth, -1.5  *tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(14 * tileWidth, -2 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(21 * tileWidth, -3 * tileWidth), true);
@@ -226,17 +232,18 @@ class Chunk {
         break;
       case 10: // jumpPad + downward staircase bait
         genPlat(1, lastTileEnd.copy(), true, 0, false);
+        
         genSafezone(1, lastTileEnd.copy().add(3 * tileWidth, -4 * tileWidth), true);
         genPlat(1, lastTileEnd.copy().add(4 * tileWidth, -4 * tileWidth), true, 0, true);
         genSafezone(1, lastTileEnd.copy().add(5 * tileWidth, -4 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(10 * tileWidth, -8 * tileWidth), true);
+        
+        genSafezone(3, lastTileEnd.copy().add(9 * tileWidth, -8 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(15 * tileWidth, -7 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(20 * tileWidth, -6 * tileWidth), true);
-        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(24 * tileWidth, -11 * tileWidth)));
-        genSafezone(3, lastTileEnd.copy().add(25 * tileWidth, -5 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(30 * tileWidth, -4 * tileWidth), true);
-        genSpikes(1, 1, true, lastTileEnd.copy().add(35 * tileWidth, -3 * tileWidth));
-        genSafezone(2, lastTileEnd.copy().add(36 * tileWidth, -3 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(19 * tileWidth, -6 * tileWidth), true);
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(15 * tileWidth, -13 * tileWidth)));
+        genSafezone(3, lastTileEnd.copy().add(23 * tileWidth, -5 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(27 * tileWidth, -4 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(31 * tileWidth, -3 * tileWidth), true);
         genSpikes(37, 1, false, lastTileEnd.copy().add(tileWidth, 0));
         break;
     }
@@ -244,7 +251,7 @@ class Chunk {
 
   void genHardChunk() {
     int randChunk = (int) (Math.random() * 3);
-    randChunk = 5;
+    //randChunk = 3;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -263,7 +270,8 @@ class Chunk {
         }
         break;
       case 2: // tunnel w/ 4 1x3 plat
-        genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        //genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        genSafezone(28, lastTileEnd.copy().add(0, -4 * tileWidth), true);
         for (int numRises = 0; numRises < 4; numRises++) {
           genSafezone(1, lastTileEnd.copy().add(9 * numRises * tileWidth, -2.5 * tileWidth), false);
           genSafezone(9, lastTileEnd.copy().add(9 * numRises * tileWidth, 0), false);
@@ -368,5 +376,18 @@ class Chunk {
   void genSpikes(int spikes, int spikeOrient, boolean isMidair, PVector spikeStart) {
     //LandTile lastTile = terrain.get(terrain.size() - 1);
     genPlat(spikes, spikeStart, false, spikeOrient, isMidair );
+  }
+  
+  void genPowerup(int powerVar) {
+    ArrayList<LandTile> cands = new ArrayList<LandTile>();
+    for (int index = terrain.size() - 1; index >= 0 && terrain.get(index).start.x > width; index--) {
+      LandTile cand = terrain.get(index);
+      LandTile aboveTile = tileAbove(cand.start.copy().add(tileWidth / 2, 0));
+      if (cand.getObsStatus() == 0 && (aboveTile == null || aboveTile.isMidair)) cands.add(cand); 
+    }
+    if (cands.size() > 0) {
+      LandTile chosen = cands.get((int) (Math.random() * cands.size()));
+      powerups.add(new Powerup(chosen.start.copy().add(tileWidth / 2, -powerupRadius), powerVar));
+    }
   }
 }

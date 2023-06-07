@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // jump boost types //<>// //<>//
+=======
+// jump boost types //<>// //<>// //<>//
+>>>>>>> phase3
 final int NORMAL = 0;
 final int MINOR = 1;
 final int MAJOR = 2;
@@ -8,6 +12,8 @@ class Player {
   private int speedx;
   private float speedy;
   private float rotAng;
+  boolean isInvincible;
+  boolean doubleJump;
   
   
   public Player(PVector center, int spdX) {
@@ -15,6 +21,9 @@ class Player {
     rotAng = PI / 4;
     speedx = spdX;
     speedy = 0;
+    isInvincible = false;
+    doubleJump = false;
+    //doubleJumps = 0;
   }
   
   public void setSpeed(int spdX, int spdY) {
@@ -64,10 +73,14 @@ class Player {
     return corners;
   }
 
-  public void jump(int boost) {
+  public void jump(int boost) { //<>//
     //System.out.println(boosted);
     if (boost == NORMAL) speedy = 0.4 * tileWidth;
     else if (boost == MINOR) speedy = 14.0 / 30 * tileWidth;
     else if (boost == MAJOR) speedy = 0.6 * tileWidth;
+<<<<<<< HEAD
   } //<>// //<>//
+=======
+  }
+>>>>>>> phase3
 }
