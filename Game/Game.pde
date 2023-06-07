@@ -14,7 +14,7 @@ String[] splashText = new String[] {
     //"Disclaimer: The music is not synced with the course",
     "Play at your own risk!",
     "If you've been playing too long, it might be time for a break",
-    "I did not need to try this hard making this game",
+    "I did not need to try this hard to make this game",
     "Please tell me this game is good I spent a few too many hours on it",
     "It's like that dinosaur game but without birds and with more cacti",
     "Hint: The spikes are not friendly, and neither are walls",
@@ -30,6 +30,8 @@ String quitGame;
 ArrayList<Button> buttons;
 int surviveTime;
 boolean isChoosingDiff;
+boolean canPushButton;
+float bTimer;
 
 Player p;
 int doubleJumps;
@@ -78,6 +80,8 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   difficulty = EASY;
   pause = false;
   isInMainMenu = withMainMenu;
+  canPushButton = true;
+  isChoosingDiff = false;
   
   classicMode = willBeClassic;
   if (classicMode && ! withMainMenu) surviveTime = 0;
@@ -300,6 +304,13 @@ void displayAllButtons() {
   for (Button button : buttons) button.displayButton();
 }
 
+void runButtonTimer() {
+  canPushButton = bTimer == 0;
+  if (bTimer > 0 && frameCount % 30 == 0) {
+    bTimer -= 0.5;
+  }
+}
+
 void activateButton() {
   for (Button button : buttons)  {
     if (mousePressed & button.isMouseOnButton()) {
@@ -313,10 +324,26 @@ void activateButton() {
         //isInMainMenu = false;
         isChoosingDiff = true;
         buttons = new ArrayList<Button>();
+        newDiffSelect();
       }
       else if (bText.equals("Quit")) {
         exit();
       }
+      else if (bText.equals("Classic")) {
+        newGame(false, true);
+      }
+      else if (bText.equals("Easy")) {
+        newGame(false, false);
+      }
+      else if (bText.equals("Medium")) {
+        newGame(false, false);
+        difficulty = MEDIUM;
+      }
+      else if (bText.equals("Difficult")) {
+        newGame(false, false);
+        difficulty = DIFFICULT;
+      }
+      bTimer = 0.5;
     }
   }
 }
@@ -349,7 +376,7 @@ void newMainMenu() {
   buttons.add(new Button(midpt.copy().add(200, 0), quitGame, 225, 80));
 }
 
-void drawMainMenu() {
+void drawTitle() {
   PFont font = createFont("ChalkboardSE-Regular", 100);
   fill(0);
   textFont(font);
@@ -362,6 +389,44 @@ void drawMainMenu() {
   
   //circle(midpt.x, midpt.y, 12);
   
+}
+
+void newDiffSelect() {
+  PVector midpt = new PVector(width / 2, height * 0.7);
+  buttons.add(new Button(midpt.copy().add(-450, 0), "Classic", 255, 80));
+  buttons.add(new Button(midpt.copy().add(-150, 0), "Easy", 255, 80));
+  buttons.add(new Button(midpt.copy().add(150, 0), "Medium", 255, 80));
+  buttons.add(new Button(midpt.copy().add(450, 0), "Difficult", 255, 80));
+}
+
+void drawDiffSelect() {
+  PFont font = createFont("ChalkboardSE-Regular", 50);
+  fill(0);
+  textFont(font);
+  textAlign(CENTER);
+  
+  text("Select gamemode", width / 2, height * 0.6);
+  
+  
+  for (Button button : buttons) {
+    if (button.isMouseOnButton()) {
+      fill(83, 127, 255);
+      PVector diffDescPos = new PVector(width / 2, height * 0.85);
+      String bText = button.getText();
+      if (bText.equals("Classic")) {
+        text("Steady progression from easy to difficult", diffDescPos.x, diffDescPos.y);
+      }
+      else if (bText.equals("Easy")) {
+        text("Should be relatively manageable", diffDescPos.x, diffDescPos.y);
+      }
+      else if (bText.equals("Medium")) {
+        text("For those that want a bit of a challenge", diffDescPos.x, diffDescPos.y);
+      }
+      else if (bText.equals("Difficult")) {
+        text("Please don't do this to yourself", diffDescPos.x, diffDescPos.y);
+      }
+    }
+  }
 }
 
 void drawPowerups() {
@@ -387,8 +452,8 @@ void draw() {
   //System.out.println(terrain.get(terrain.size() - 1).end.x);
   
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
-  text(difficulty, width / 2, height / 2);
-  if (isInMainMenu) drawMainMenu();
+  //text(difficulty, width / 2, height / 2);
+  
   if (! gameOver && ! pause) {
     if (! isInMainMenu) score++;
     movePlayer();
@@ -407,7 +472,11 @@ void draw() {
     updateDifficulty();
   }
   displayAllButtons();
-  activateButton();
+  runButtonTimer();
+  if (canPushButton) activateButton();
+  
+  if (isInMainMenu || isChoosingDiff) drawTitle();
+  if (isChoosingDiff) drawDiffSelect();
   
   
   //if (pause) pauseGame();
