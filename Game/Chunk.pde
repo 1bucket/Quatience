@@ -11,13 +11,8 @@ class Chunk {
       // test probabilities
       easyChance = 0;
       medChance = 100;
-<<<<<<< HEAD
-      //easyChance = 0;
-      medChance = 0;
-=======
       //easyChance = 100;
       //medChance = 0;
->>>>>>> phase3
       willGenCoin = true;
       
       // real chances
