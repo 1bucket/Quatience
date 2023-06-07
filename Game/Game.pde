@@ -487,7 +487,7 @@ void movePlayer() {
     }
   }
   
-  while (rectPoints.size() < 12) {
+  while (rectPoints.size() < width / (rWidth + 20)) {
     if (rectPoints.size() == 0) rectPoints.add(new PVector(0, baseElev + 20));
     else rectPoints.add(rectPoints.get(rectPoints.size() - 1).copy().add(rWidth + 20, 0));
   }
@@ -649,10 +649,19 @@ LandTile tileBelow(PVector point) {
 }
 
 LandTile tileAbove(PVector point) {
-  PVector pCenter = p.getCenter();
+  //PVector pCenter = p.getCenter();
   for (LandTile tile : terrain) {
-    if (point.x >= tile.start.x && point.x <= tile.end.x && pCenter.y > tile.start.y)
+    if (point.x >= tile.start.x && point.x <= tile.end.x && point.y > tile.start.y)
       return tile;
+  }
+  return null;
+}
+
+LandTile tileBefore(LandTile tile) {
+  for (LandTile cand : terrain) {
+    if (cand.end.x - tile.start.x == 0 && cand.end.y == tile.start.y) {
+      return cand;
+    }
   }
   return null;
 }

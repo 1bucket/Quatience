@@ -11,8 +11,8 @@ class Chunk {
       // test probabilities
       easyChance = 0;
       medChance = 100;
-      //easyChance = 100;
-      //medChance = 0;
+      easyChance = 100;
+      medChance = 0;
       willGenCoin = true;
       
       // real chances
@@ -45,7 +45,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    randChunk = 10;
+    randChunk = 11;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -128,7 +128,7 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    randChunk = 10;
+    randChunk = 2;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -226,17 +226,18 @@ class Chunk {
         break;
       case 10: // jumpPad + downward staircase bait
         genPlat(1, lastTileEnd.copy(), true, 0, false);
+        
         genSafezone(1, lastTileEnd.copy().add(3 * tileWidth, -4 * tileWidth), true);
         genPlat(1, lastTileEnd.copy().add(4 * tileWidth, -4 * tileWidth), true, 0, true);
         genSafezone(1, lastTileEnd.copy().add(5 * tileWidth, -4 * tileWidth), true);
+        
         genSafezone(3, lastTileEnd.copy().add(9 * tileWidth, -8 * tileWidth), true);
         genSafezone(3, lastTileEnd.copy().add(15 * tileWidth, -7 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(20 * tileWidth, -6 * tileWidth), true);
-        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(24 * tileWidth, -11 * tileWidth)));
-        genSafezone(3, lastTileEnd.copy().add(25 * tileWidth, -5 * tileWidth), true);
-        genSafezone(3, lastTileEnd.copy().add(30 * tileWidth, -4 * tileWidth), true);
-        genSpikes(1, 1, true, lastTileEnd.copy().add(35 * tileWidth, -3 * tileWidth));
-        genSafezone(2, lastTileEnd.copy().add(36 * tileWidth, -3 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(19 * tileWidth, -6 * tileWidth), true);
+        if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(15 * tileWidth, -13 * tileWidth)));
+        genSafezone(3, lastTileEnd.copy().add(23 * tileWidth, -5 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(27 * tileWidth, -4 * tileWidth), true);
+        genSafezone(3, lastTileEnd.copy().add(31 * tileWidth, -3 * tileWidth), true);
         genSpikes(37, 1, false, lastTileEnd.copy().add(tileWidth, 0));
         break;
     }

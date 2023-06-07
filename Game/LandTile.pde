@@ -22,7 +22,9 @@ class LandTile extends Displayable {
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
     this.isMidair = isMidair;
-    if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
+    //if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
+    LandTile tileBefore = tileBefore(this);
+    if (isMidair && tileBefore == null) { 
       walls.add(new Wall(start.copy().add(0, 10), 10));
       //walls.add(new Wall(end.copy().add(0, 10), 10));
     }
