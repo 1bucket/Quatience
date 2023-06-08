@@ -121,6 +121,8 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   isInMainMenu = withMainMenu;
   canPushButton = true;
   isChoosingDiff = false;
+  frameCount = 0;
+  surviveTime = 0;
   
   classicMode = willBeClassic;
   if (classicMode && ! withMainMenu) surviveTime = 0;
@@ -376,8 +378,10 @@ void activateButton() {
     if (mousePressed & button.isMouseOnButton()) {
       fx[BUTTON].play();
       String bText = button.getText();
-      if (bText.equals("Resume")) 
+      if (bText.equals("Resume")) {
         resumeGame();
+        background.play();
+      }
       else if (bText.equals("Restart")) {
         newGame(false, classicMode);
       }
@@ -403,6 +407,9 @@ void activateButton() {
       else if (bText.equals("Difficult")) {
         newGame(false, false);
         difficulty = DIFFICULT;
+      }
+      else if (bText.equals("Main Menu")) {
+        newGame(true, false);
       }
       bTimer = 0.5;
     }
@@ -458,6 +465,25 @@ void newDiffSelect() {
   buttons.add(new Button(midpt.copy().add(-150, 0), "Easy", 255, 80));
   buttons.add(new Button(midpt.copy().add(150, 0), "Medium", 255, 80));
   buttons.add(new Button(midpt.copy().add(450, 0), "Difficult", 255, 80));
+}
+
+void loadDeathMenu() {
+  int bWidth = 120;
+  int bHeight = 75;
+  PVector midpt = new PVector(width / 2, height * 0.85);
+  Button quit = new Button(midpt.copy().add(250, 0), "Quit", bWidth, bHeight); 
+  Button restart = new Button(midpt.copy().add(-250, 0), "Restart", bWidth, bHeight);
+  Button mainMenu = new Button(midpt.copy(), "Main Menu", 2 * bWidth, bHeight);
+  buttons.add(quit);
+  buttons.add(restart);
+  buttons.add(mainMenu);
+}
+
+void drawDeathMenu() {
+  textAlign(CENTER);
+  fill(255);
+  textSize(50);
+  text("Score: " + score, width / 2, height * 0.75);
 }
 
 void drawDiffSelect() {
@@ -522,7 +548,7 @@ void draw() {
     }
     movePlayer();
   }
-  if (! isInMainMenu) displayScore();
+  if (! isInMainMenu && ! gameOver) displayScore();
   drawTerrain();
   drawUnderground();
   drawOrbs();
@@ -531,7 +557,7 @@ void draw() {
   drawPowerups();
   displayBuffs();
   runPowerupTimer();
-  if (classicMode && ! pause && ! isInMainMenu) {
+  if (classicMode && ! pause && ! isInMainMenu && ! gameOver) {
     surviveTime++;
     updateDifficulty();
   }
@@ -542,6 +568,13 @@ void draw() {
   if (isInMainMenu || isChoosingDiff) drawTitle();
   if (isChoosingDiff) drawDiffSelect();
   
+  if (gameOver) {
+    int timeSinceDeath = frameCount - surviveTime;
+    if (timeSinceDeath >= 180) {
+      if (timeSinceDeath == 180) loadDeathMenu();
+      drawDeathMenu();
+    }
+  }
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
 }
@@ -631,7 +664,7 @@ void movePlayer() {
     else {
       gen.genChunk();
     }
-    if (Math.random() < 0.5) {
+    if (Math.random() < 0.05) {
       gen.genPowerup((int) random(0, 2));
     }
   }
@@ -867,11 +900,13 @@ void pauseGame() {
   int bWidth = 120;
   int bHeight = 75;
   PVector midpt = new PVector(width / 2, height * .75);
-  Button resume = new Button(midpt.copy().add(-150, 0), "Resume", bWidth, bHeight);
+  Button resume = new Button(midpt.copy().add(-250, 0), "Resume", bWidth, bHeight);
   //resume.displayButton();
-  Button restart = new Button(midpt.copy().add(150, 0), "Restart", bWidth, bHeight);
+  Button restart = new Button(midpt.copy().add(250, 0), "Restart", bWidth, bHeight);
+  Button mainMenu = new Button(midpt.copy(), "Main Menu", 2 * bWidth, bHeight);
   buttons.add(resume);
   buttons.add(restart);
+  buttons.add(mainMenu);
   //System.out.println("paused");
 }
 

@@ -9,17 +9,17 @@ class Chunk {
     //difficulty = DIFFICULT;
     if (difficulty == EASY) {
       // test probabilities
-      easyChance = 0;
-      medChance = 100;
-      //easyChance = 100;
-      //medChance = 0;
-      willGenCoin = true;
+      //easyChance = 0;
+      //medChance = 100;
+      ////easyChance = 100;
+      ////medChance = 0;
+      //willGenCoin = true;
       
       // real chances
-      //easyChance = 80;
-      //medChance = 20;
+      easyChance = 80;
+      medChance = 20;
       //hardChance = 0;
-      //willGenCoin = (int) (Math.random() * 100) < 7;
+      willGenCoin = (int) (Math.random() * 100) < 7;
       /** variable hardChance is not used but is kept
        and commented out as a reference */
     } else if (difficulty == MEDIUM) {
@@ -128,9 +128,8 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    randChunk = 6;
+    //randChunk = 6;
     LandTile lastTile = terrain.get(terrain.size() - 1);
-    PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
     // lxh, l = length, h = height
     switch(randChunk) {
@@ -156,6 +155,7 @@ class Chunk {
         break;
       case 3: // 11 spikes + 3 orbs
         genSafezone(4, lastTileEnd.copy().add(0, -tileWidth), false);
+        genSafezone(4, lastTileEnd.copy(), false);
         genSpikes(20, 1, false, lastTileEnd.copy().add(4 * tileWidth, 0));
         genSafezone(4, lastTileEnd.copy().add(24 * tileWidth, -tileWidth), false);
         genSafezone(1, lastTileEnd.copy().add(25 * tileWidth, 0), false);
@@ -248,7 +248,6 @@ class Chunk {
     int randChunk = (int) (Math.random() * 3);
     //randChunk = 3;
     LandTile lastTile = terrain.get(terrain.size() - 1);
-    PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
     // lxh, l = length, h = height
     switch(randChunk) {
@@ -265,8 +264,8 @@ class Chunk {
         }
         break;
       case 2: // tunnel w/ 4 1x3 plat
-        //genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
-        genSafezone(28, lastTileEnd.copy().add(0, -4 * tileWidth), true);
+        genSpikes(28, 1, true, lastTileEnd.copy().add(0, -4 * tileWidth));
+        //genSafezone(28, lastTileEnd.copy().add(0, -4 * tileWidth), true);
         for (int numRises = 0; numRises < 4; numRises++) {
           genSafezone(1, lastTileEnd.copy().add(9 * numRises * tileWidth, -2.5 * tileWidth), false);
           genSafezone(9, lastTileEnd.copy().add(9 * numRises * tileWidth, 0), false);
@@ -323,10 +322,6 @@ class Chunk {
         }
         genSafezone(50, lastTileEnd.copy(), false);
         break;
-        
-      
-        
-        
     }
   }
 
@@ -349,11 +344,6 @@ class Chunk {
   }
 
   void genSafezone(int safes, PVector safeStart, boolean isMidair) {
-    //for (int numTiles = 0; numTiles < safes; numTiles++) {
-    //  PVector start = safeStart.copy().add((numTiles * tileWidth), 0);
-    //  PVector end = start.copy().add(tileWidth, 0);
-    //  terrain.add(new LandTile(start, end, false, 0, isMidair));
-    //}
     genPlat(safes, safeStart, false, 0, isMidair);
   }
   
@@ -369,7 +359,6 @@ class Chunk {
   }
 
   void genSpikes(int spikes, int spikeOrient, boolean isMidair, PVector spikeStart) {
-    //LandTile lastTile = terrain.get(terrain.size() - 1);
     genPlat(spikes, spikeStart, false, spikeOrient, isMidair );
   }
   
