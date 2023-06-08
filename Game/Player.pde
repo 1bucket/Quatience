@@ -19,7 +19,6 @@ class Player {
     speedy = 0;
     isInvincible = false;
     doubleJump = false;
-    //doubleJumps = 0;
   }
   
   public void setSpeed(int spdX, int spdY) {
@@ -64,13 +63,11 @@ class Player {
       
       
       corners[index] = new PVector(cornerX, cornerY); 
-      //LandTile tileUnder = Game.tileBelow(corners[index]);
     }
     return corners;
   }
 
   public void jump(int boost) {  //<>//
-    //fx[JUMP].play();
     if (boost == NORMAL) speedy = 0.4 * tileWidth;
     else if (boost == MINOR) speedy = 14.0 / 30 * tileWidth;
     else if (boost == MAJOR) speedy = 0.6 * tileWidth;

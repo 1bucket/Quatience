@@ -5,41 +5,27 @@ static final int BELOW = 2;
 
 class LandTile extends Displayable {
   PVector start, end;
-  //boolean hasObstacle;
   private boolean hasJumpPad;
   private int obsStatus;
   private boolean isMidair;
-  //Obstacle obs;
-  //int diff;
-  
-  //private color col;
-  
+
   public LandTile(PVector newStart, PVector newEnd,  boolean willHaveJumpPad, int obsOrient, boolean isMidair) {
     super(new PVector((newStart.x + newEnd.x) / 2, isMidair ? newStart.y - 5 : newStart.y));
     start = isMidair ? newStart.add(0, -10) : newStart;
     end = isMidair ? newEnd.add(0, -10) : newEnd;
-    //hasObstacle = willHaveObstacle;
     hasJumpPad = willHaveJumpPad;
     obsStatus = obsOrient;
     this.isMidair = isMidair;
-    //if (isMidair && ! terrain.get(terrain.size() - 1).isMidair) {
     LandTile tileBefore = tileBefore(this);
     if (isMidair && tileBefore == null) { 
       walls.add(new Wall(start.copy().add(0, 10), 10));
-      //walls.add(new Wall(end.copy().add(0, 10), 10));
     }
   }
-  
-  //public LandTile(PVector newStart, PVector newEnd, color c, boolean willHaveJumpPad, int obsOrient, boolean isMidAir) {
-  //  this(newStart, newEnd, willHaveJumpPad, obsOrient, isMidAir);
-  //  col = c;
-  //}
   
   public void shift(int xShift) {
     super.shift(xShift);
     start.add(-xShift, 0);
     end.add(-xShift, 0);
-    //diff += xShift;
   }
   
   public int getObsStatus() {

@@ -70,35 +70,35 @@ ArrayList<SoundFile> playlist;
 ArrayList<SoundFile> played;
 
 void setup() {
-  //for (String font : PFont.list()) println(font);
   fullScreen();
   themeColor = color(0, 15, 221);
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
   
-  //loadFX();
-  //loadPlaylist();
-  //menuTrack = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
+  loadFX();
+  loadPlaylist();
+  menuTrack = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
   newGame(true, true);
 }
 
 void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   loadFX();
-  //if (withMainMenu) {
-  //  menuTrack.loop();
-  //}
-  //else {
-  //  fx[START].play();
-  //  if (menuTrack != null) menuTrack.stop();
-  //  if (background != null) background.stop();
-  //  resetPlaylist();
-  //  beginTrack();
-  //}
+  if (withMainMenu) {
+    menuTrack.loop();
+    menuTrack.amp(0.5);
+  }
+  else {
+    fx[START].play();
+    fx[START].amp(0.5);
+    if (menuTrack != null) menuTrack.stop();
+    if (background != null) background.stop();
+    resetPlaylist();
+    beginTrack();
+  }
   
   gameOver = false;
   pause = false;
   score = 0;
-  difficulty = EASY;
   pause = false;
   isInMainMenu = withMainMenu;
   canPushButton = true;
@@ -109,9 +109,6 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   classicMode = willBeClassic;
   if (classicMode && ! withMainMenu) surviveTime = 0;
   
-  
-  
-  //themeColor = color(132, 0, 218);
   lineWeight = 1;
   rWidth = 120;
   
@@ -121,17 +118,13 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   coinRadius = tileWidth;
   coins = new ArrayList<Coin>();
-  //coins.add(new Coin(new PVector(width / 2, 0.55 * height)));
   
   powerupRadius = (int) (0.5 * tileWidth);
   powerups = new ArrayList<Powerup>();
-  //powerups.add(new Powerup(new PVector(width / 2, height * 0.65), DOUBLE_JUMP));
   invTimer = 0;
   doubleJTimer = 0;
   trail = new ArrayList<PVector>();
   
-  
-  //pCol = color(32, 129, 255);
   pCol = color(0, 255, 246);
   canJump = true;
   doubleJumps = 0;
@@ -149,16 +142,10 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   terrain.add(startTile);
   walls = new ArrayList<Wall>();
   rectPoints = new ArrayList<PVector>();
-  
-  // testing elements
-  
+    
   jumpOrbs = new ArrayList<JumpOrb>();
-  //jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
-  //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
-  //walls.add(new Wall(testTile.start.copy().add(0, 30), 30));
-
+  
   p = new Player(new PVector(180, baseElev - tileWidth / 2), width / 200);
-  //stroke(0, 0, 0);
   
   if (withMainMenu) newMainMenu();
   
@@ -192,6 +179,7 @@ void resetPlaylist() {
 void beginTrack() {
   background = playlist.remove((int) random(0, playlist.size()));
   background.play();
+  background.amp(0.5);
   played.add(background);
 }
 
@@ -206,7 +194,6 @@ void drawOrbs() {
   noStroke();
   fill(red(pCol) + 42, green(pCol) + 40, blue(pCol) + 34);
   for (JumpOrb orb : jumpOrbs) {
-    //System.out.println("hello");
     PVector pos = orb.getPos();
     circle(pos.x, pos.y, orbRadius * 2);
   }
@@ -225,7 +212,6 @@ void drawPlayer() {
   else {
     if (p.doubleJump) {
       trail.add(p.getCenter().copy());
-      //stroke(106, 255, 33);
     }
     // trail, if applicable
     fill(106, 255, 33);
@@ -253,7 +239,6 @@ void drawPlayer() {
 }
 
 void drawTerrain() {
-  //System.out.println(startTile.end.x);
   // modified loop to incorporate changes in elevation
   strokeWeight(lineWeight);
   for (LandTile tile : terrain) {
@@ -261,16 +246,12 @@ void drawTerrain() {
     
     fill(red(themeColor) - 70, green(themeColor), blue(themeColor) - 90);
     if (tile.isMidair) {
-      //fill(darker);
-      //System.out.println(constrain(tile.start.x, 0, tile.end.x));
-      //System.out.println(tile.end.x);
       line(tile.start.x, tile.start.y + 10, tile.end.x, tile.end.y + 10);
       rect(tile.start.x, tile.start.y, tile.end.x - tile.start.x, 10);
     }
     else {
       noStroke();
       
-      //fill(255, 0, 0);
       rect(constrain(tile.start.x, 0, tile.end.x), baseElev, tile.end.x, height);
       if (tile.start.y != baseElev) {
         stroke(red(themeColor) - 80, green(themeColor), blue(themeColor) - 120);
@@ -279,8 +260,7 @@ void drawTerrain() {
       }
       stroke(themeColor);
     }
-    //strokeWeight(3);
-    //line(tile.start.x, tile.start.y + 2, tile.end.x, tile.end.y + 2);
+
     int obsStatus = tile.getObsStatus(); 
     if (obsStatus != 0) {
       fill(0);
@@ -303,20 +283,7 @@ void drawTerrain() {
       fill(pCol);
       rect(tile.start.x, tile.start.y - 5, Math.abs(tile.start.x - tile.end.x), 5);
     }
-   
-    
   }
-  
-  //for (Wall wall : walls) {
-  //  stroke(themeColor);
-    
-  //  //System.out.println(wall);
-  //  //System.out.println(terrain.get(1));
-  //  PVector pos = wall.getPos();
-  //  line(pos.x, pos.y, pos.x, pos.y - wall.getHeight());
-  //}
-  // for indicating end of start tile
-  //line(startTile.end.x, elev, startTile.end.x, 0);
   stroke(200, 150, 200);
 }
 
@@ -358,6 +325,7 @@ void activateButton() {
   for (Button button : buttons)  {
     if (mousePressed & button.isMouseOnButton()) {
       fx[BUTTON].play();
+      fx[BUTTON].amp(0.7);
       String bText = button.getText();
       if (bText.equals("Resume")) {
         resumeGame();
@@ -367,7 +335,6 @@ void activateButton() {
         newGame(false, classicMode);
       }
       else if (bText.equals("Start Game") || bText.equals("Start Suffering")) {
-        //isInMainMenu = false;
         isChoosingDiff = true;
         buttons = new ArrayList<Button>();
         newDiffSelect();
@@ -377,9 +344,11 @@ void activateButton() {
       }
       else if (bText.equals("Classic")) {
         newGame(false, true);
+        difficulty = EASY;
       }
       else if (bText.equals("Easy")) {
         newGame(false, false);
+        difficulty = EASY;
       }
       else if (bText.equals("Medium")) {
         newGame(false, false);
@@ -433,9 +402,6 @@ void drawTitle() {
   
   textSize(5 * abs(sin(PI / 45 * frameCount)) + 30);
   text(splash, width / 2, height * 0.5);
-  
-  //circle(midpt.x, midpt.y, 12);
-  
 }
 
 void newDiffSelect() {
@@ -511,18 +477,13 @@ void drawPowerups() {
   }
 }
 
-void draw() {
-  //System.out.println((int) Math.random() * 2);
-  //System.out.println("p" + p.getCenter());
-  //System.out.println(terrain.get(terrain.size() - 1).end.x);
-  
+void draw() { 
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
-  //text(difficulty, width / 2, height / 2);
   
   if (! gameOver && ! pause) {
     if (! isInMainMenu) {
       score++;
-      //shufflePlay();
+      shufflePlay();
     }
     movePlayer();
   }
@@ -670,6 +631,7 @@ void checkCollision() {
         score += 500;
         coins.remove(index--);
         fx[COIN].play();
+        fx[COIN].amp(0.5);
       }
     }
     
@@ -686,6 +648,7 @@ void checkCollision() {
         }
         powerups.remove(index--);
         fx[POWERUP].play();
+        fx[POWERUP].amp(0.5);
       }
     }
         
@@ -705,10 +668,6 @@ void checkCollision() {
           }
         
     }
-    
-    
-    //System.out.println(testTile.getObsStatus());
-    //System.out.println("p" + tileUnder.getObsStatus());
     
     // obstacle collision detection
     LandTile tileUnder = tileBelow(corner);
@@ -805,7 +764,6 @@ LandTile tileBelow(PVector point) {
 }
 
 LandTile tileAbove(PVector point) {
-  //PVector pCenter = p.getCenter();
   for (LandTile tile : terrain) {
     if (point.x >= tile.start.x && point.x <= tile.end.x && point.y > tile.start.y)
       return tile;
@@ -857,18 +815,16 @@ boolean numInRange(float test, float lowerBound, float upperBound) {
 
 void endGame() {
   fx[DEATH].play();
+  fx[DEATH].amp(0.5);
   if (background != null) background.stop();
   gameOver = true;
   p.setSpdX(0);
   loadDeathMenu();
-  //System.out.println("bonk");
+
 }
 
 void pauseGame() {
-  pause = true;
-  // freeze game
-  //p.setSpdX(0);
-  
+  pause = true;  
   // build pause menu
   int bWidth = 120;
   int bHeight = 75;
@@ -880,7 +836,6 @@ void pauseGame() {
   buttons.add(resume);
   buttons.add(restart);
   buttons.add(mainMenu);
-  //System.out.println("paused");
 }
 
 void resumeGame() {
@@ -890,10 +845,6 @@ void resumeGame() {
 
 void keyPressed() {
   if (key == ' ' && ! gameOver && ! pause) {
-    //if (cornersOnGround().size() == 2) p.jump(NORMAL);
-    //if (p.getSpdY() == 0 && tileBelow(p.getCenter()).getObsStatus() == 0) p.jump(NORMAL);
-    //PVector pCenter = p.getCenter();
-    //if (abs(pCenter.y - tileBelow(pCenter).start.y) == tileWidth / 2) p.jump(NORMAL);
     if (checkOrbCollision()) p.jump(MINOR);
     if (canJump) {
       p.jump(NORMAL);
@@ -911,11 +862,11 @@ void keyPressed() {
   if (key == 'q' && ! isInMainMenu && ! gameOver) {
     if (pause) {
       resumeGame();
-      //background.play();
+      background.play();
     }
     else {
       pauseGame();
-      //background.pause();
+      background.pause();
     }
   }
 }

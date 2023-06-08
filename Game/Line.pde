@@ -36,8 +36,6 @@ class Line {
     return endpts == null ? null : endpts;
   }
   
-  
-  
   public float output(float input) {
     return slope * input + yInt;
   }
@@ -59,13 +57,10 @@ class Line {
       float meetX = (l2.getYInt() - yInt) / (slope - l2.getSlope());
       boolean b = numInRange(meetX, l1LowerBound, l1UpperBound) &&
                   numInRange(meetX, l2LowerBound, l2UpperBound);
-      //System.out.println(b);
       return b;
       
     }
   }
-  
-  
   
   public float distToLine(PVector pt) {
     float nume = Math.abs(slope * pt.x - pt.y + yInt);

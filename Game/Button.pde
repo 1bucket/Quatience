@@ -11,7 +11,6 @@ class Button extends Displayable{
   }
   
   public void displayButton() {
-    //rectMode(CENTER);
     stroke(0);
     color bColor = isMouseOnButton() ? color(red(themeColor) + 86, green(themeColor) + 152, blue(themeColor) + 34) 
                                      : color(red(themeColor) + 14, green(themeColor) + 34, blue(themeColor) + 34);
