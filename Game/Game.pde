@@ -1,3 +1,5 @@
+import processing.sound.*;
+
 boolean pause;
 int difficulty;
 final int EASY = 0;
@@ -56,10 +58,16 @@ int rWidth;
 LandTile startTile;
 LandTile testTile;
 
+SoundFile soundfile;
+
 void setup() {
   for (String font : PFont.list()) println(font);
   fullScreen();
   newGame(true, true);
+  
+  soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
+  soundfile.play();
+  
   
    
   //frameRate(60);
