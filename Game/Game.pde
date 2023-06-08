@@ -75,43 +75,25 @@ void setup() {
   themeColor = color(0, 15, 221);
   background(red(themeColor), green(themeColor) + 70, blue(themeColor));
   
-  loadFX();
-  loadPlaylist();
-  menuTrack = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
+  //loadFX();
+  //loadPlaylist();
+  //menuTrack = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
   newGame(true, true);
-  
-  //soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
-  //soundfile.play();
-  
-  
-   
-  //frameRate(60);
-  //Line test1 = new Line(2, 0);
-  //Line test3 = new Line(new PVector(1, 2), new PVector(0, 1));
-  //PVector[] tests = test3.getEndpts();
-  //sortPtsY(tests);
-  //for (PVector endpt : tests) System.out.println(endpt);
-  //Line test2 = new Line(1, 1);
-  //System.out.println(test1.meetWithinDomain(2, 8, test2, -5, 2));
-  //drawUnderground();
 }
 
 void newGame(boolean withMainMenu, boolean willBeClassic) {
   
-  //background = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
-  //background.loop();
-  
   loadFX();
-  if (withMainMenu) {
-    menuTrack.loop();
-  }
-  else {
-    fx[START].play();
-    if (menuTrack != null) menuTrack.stop();
-    if (background != null) background.stop();
-    resetPlaylist();
-    beginTrack();
-  }
+  //if (withMainMenu) {
+  //  menuTrack.loop();
+  //}
+  //else {
+  //  fx[START].play();
+  //  if (menuTrack != null) menuTrack.stop();
+  //  if (background != null) background.stop();
+  //  resetPlaylist();
+  //  beginTrack();
+  //}
   
   gameOver = false;
   pause = false;
@@ -353,8 +335,7 @@ void displayBuffs() {
   if (doubleJTimer > 0) {
     buffs.add("Double Jump: " + doubleJTimer);
   }
-  PFont font = createFont("Comic Sans MS Bold", 50);
-  textFont(font);
+  textSize(50);
   textAlign(LEFT);
   fill(255);
   for (int index = 0; index < buffs.size(); index++) {
@@ -445,9 +426,7 @@ void newMainMenu() {
 }
 
 void drawTitle() {
-  PFont font = createFont("Comic Sans MS Bold", 100);
-  fill(0);
-  textFont(font);
+  textSize(100);
   textAlign(CENTER);
   
   text("Geometry Dash Infinite", width / 2, height * 2 / 5);
@@ -487,9 +466,8 @@ void drawDeathMenu() {
 }
 
 void drawDiffSelect() {
-  PFont font = createFont("Comic Sans MS Bold", 50);
+  textSize(50);
   fill(0);
-  textFont(font);
   textAlign(CENTER);
   
   text("Select gamemode", width / 2, height * 0.6);
@@ -544,7 +522,7 @@ void draw() {
   if (! gameOver && ! pause) {
     if (! isInMainMenu) {
       score++;
-      shufflePlay();
+      //shufflePlay();
     }
     movePlayer();
   }
@@ -569,14 +547,8 @@ void draw() {
   if (isChoosingDiff) drawDiffSelect();
   
   if (gameOver) {
-    int timeSinceDeath = frameCount - surviveTime;
-    if (timeSinceDeath >= 180) {
-      if (timeSinceDeath == 180) loadDeathMenu();
-      drawDeathMenu();
-    }
+    drawDeathMenu();
   }
-  //if (pause) pauseGame();
-  //else p.setSpdX(curSpd);
 }
 
 void updateDifficulty() {
@@ -588,7 +560,7 @@ void updateDifficulty() {
 void runPowerupTimer() {
   p.isInvincible = invTimer > 0;
   p.doubleJump = doubleJTimer > 0;
-  if (frameCount % 60 == 0) {
+  if (frameCount % 60 == 0 && ! gameOver && ! pause) {
     if (invTimer > 0) {
       invTimer--;
     }
@@ -888,6 +860,7 @@ void endGame() {
   if (background != null) background.stop();
   gameOver = true;
   p.setSpdX(0);
+  loadDeathMenu();
   //System.out.println("bonk");
 }
 
@@ -938,11 +911,11 @@ void keyPressed() {
   if (key == 'q' && ! isInMainMenu && ! gameOver) {
     if (pause) {
       resumeGame();
-      background.play();
+      //background.play();
     }
     else {
       pauseGame();
-      background.pause();
+      //background.pause();
     }
   }
 }

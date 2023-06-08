@@ -9,15 +9,15 @@ class Chunk {
     //difficulty = DIFFICULT;
     if (difficulty == EASY) {
       // test probabilities
-      //easyChance = 0;
-      //medChance = 100;
-      ////easyChance = 100;
-      ////medChance = 0;
+      easyChance = 0;
+      medChance = 100;
+      easyChance = 100;
+      medChance = 0;
       //willGenCoin = true;
       
       // real chances
-      easyChance = 80;
-      medChance = 20;
+      //easyChance = 80;
+      //medChance = 20;
       //hardChance = 0;
       willGenCoin = (int) (Math.random() * 100) < 7;
       /** variable hardChance is not used but is kept
@@ -45,7 +45,7 @@ class Chunk {
 
   void genEasyChunk() {
     int randChunk = (int) (Math.random() * 12);
-    //randChunk = 11;
+    randChunk = 8;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector start, end;
     PVector lastTileEnd = lastTile.end.copy();
@@ -78,7 +78,7 @@ class Chunk {
         terrain.add(new LandTile(start, end, false, 1, false));
         if (willGenCoin) coins.add(new Coin(lastTileEnd.copy().add(4 * tileWidth, -5 * tileWidth))); 
         break;
-      case 6: // 5 spikes + platforms over 2nd-4th spikes
+      case 6: // 5 spikes + platforms over middle 3 spikes
         genSpikes(5, 1, false, lastTileEnd);
         PVector platStart = lastTile.end.copy().add(tileWidth, - tileWidth);
         genSafezone(3, platStart, true);
@@ -128,7 +128,7 @@ class Chunk {
 
   void genMedChunk() {
     int randChunk = (int) (Math.random() * 11);
-    //randChunk = 6;
+    randChunk = 3;
     LandTile lastTile = terrain.get(terrain.size() - 1);
     PVector lastTileEnd = lastTile.end.copy();
     // lxh, l = length, h = height
@@ -158,7 +158,8 @@ class Chunk {
         genSafezone(4, lastTileEnd.copy(), false);
         genSpikes(20, 1, false, lastTileEnd.copy().add(4 * tileWidth, 0));
         genSafezone(4, lastTileEnd.copy().add(24 * tileWidth, -tileWidth), false);
-        genSafezone(1, lastTileEnd.copy().add(25 * tileWidth, 0), false);
+        genSafezone(4, lastTileEnd.copy().add(24 * tileWidth, 0), false);
+        //genSafezone(1, lastTileEnd.copy().add(25 * tileWidth, 0), false);
         jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(7 * tileWidth, -2.5 * tileWidth)));
         jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(12 * tileWidth, -4 * tileWidth)));
         jumpOrbs.add(new JumpOrb(lastTileEnd.copy().add(18 * tileWidth, -4 * tileWidth)));
@@ -330,13 +331,13 @@ class Chunk {
     int toAdd = 7;
     switch(difficulty) {
       case EASY:
-        toAdd += (int) (Math.random() * 10);
+        toAdd += (int) (Math.random() * 20);
         break;
       case MEDIUM:
-        toAdd += (int) (Math.random() * 7);
+        toAdd += (int) (Math.random() * 11);
         break;
       case DIFFICULT:
-        toAdd += (int) (Math.random() * 5);
+        toAdd += (int) (Math.random() * 7);
         break;
     }
     PVector lastTileEnd = terrain.get(terrain.size() - 1).end.copy();
