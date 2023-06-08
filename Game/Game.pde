@@ -353,7 +353,7 @@ void displayBuffs() {
   if (doubleJTimer > 0) {
     buffs.add("Double Jump: " + doubleJTimer);
   }
-  PFont font = createFont("ChalkboardSE-Regular", 50);
+  PFont font = createFont("Comic Sans MS Bold", 50);
   textFont(font);
   textAlign(LEFT);
   fill(255);
@@ -445,7 +445,7 @@ void newMainMenu() {
 }
 
 void drawTitle() {
-  PFont font = createFont("ChalkboardSE-Regular", 100);
+  PFont font = createFont("Comic Sans MS Bold", 100);
   fill(0);
   textFont(font);
   textAlign(CENTER);
@@ -487,7 +487,7 @@ void drawDeathMenu() {
 }
 
 void drawDiffSelect() {
-  PFont font = createFont("ChalkboardSE-Regular", 50);
+  PFont font = createFont("Comic Sans MS Bold", 50);
   fill(0);
   textFont(font);
   textAlign(CENTER);
