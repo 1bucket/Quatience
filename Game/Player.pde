@@ -1,4 +1,4 @@
-// jump boost types //<>//
+// jump boost types //<>// //<>//
 final int NORMAL = 0;
 final int MINOR = 1;
 final int MAJOR = 2;
@@ -69,7 +69,7 @@ class Player {
     return corners;
   }
 
-  public void jump(int boost) { //<>// //<>//
+  public void jump(int boost) { //<>// //<>// //<>//
     //System.out.println(boosted);
     if (boost == NORMAL) speedy = 0.4 * tileWidth;
     else if (boost == MINOR) speedy = 14.0 / 30 * tileWidth;

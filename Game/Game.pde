@@ -61,12 +61,12 @@ LandTile testTile;
 SoundFile soundfile;
 
 void setup() {
-  for (String font : PFont.list()) println(font);
+  //for (String font : PFont.list()) println(font);
   fullScreen();
   newGame(true, true);
   
-  soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
-  soundfile.play();
+  //soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
+  //soundfile.play();
   
   
    
@@ -82,6 +82,9 @@ void setup() {
 }
 
 void newGame(boolean withMainMenu, boolean willBeClassic) {
+  
+  soundfile = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
+  soundfile.play();
   
   gameOver = false;
   pause = false;
