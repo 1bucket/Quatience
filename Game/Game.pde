@@ -85,6 +85,8 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   soundfile = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
   soundfile.play();
+  SoundFile test = new SoundFile(this, "soundtracks/ingame/mixkit-anthem-01-567.mp3");
+  test.play();
   
   gameOver = false;
   pause = false;
