@@ -58,13 +58,21 @@ int rWidth;
 LandTile startTile;
 LandTile testTile;
 
-SoundFile soundfile;
+SoundFile background;
+SoundFile[] fx;
+final int BUTTON = 0;
+final int START = 1;
+final int COIN = 2;
+final int POWERUP = 3;
+final int DEATH = 4;
+ArrayList<SoundFile> playlist;
+ArrayList<SoundFile> played;
 
 void setup() {
   //for (String font : PFont.list()) println(font);
   fullScreen();
+  loadFX();
   newGame(true, true);
-  System.out.println(this);
   
   //soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
   //soundfile.play();
@@ -84,10 +92,11 @@ void setup() {
 
 void newGame(boolean withMainMenu, boolean willBeClassic) {
   
-  soundfile = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
-  soundfile.play();
-  SoundFile test = new SoundFile(this, "soundtracks/ingame/mixkit-anthem-01-567.mp3");
-  test.play();
+  //background = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
+  //background.loop();
+  
+  loadFX();
+  resetPlaylist();
   
   gameOver = false;
   pause = false;
@@ -100,6 +109,7 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   classicMode = willBeClassic;
   if (classicMode && ! withMainMenu) surviveTime = 0;
+  
   
   
   //themeColor = color(132, 0, 218);
@@ -117,7 +127,7 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   powerupRadius = (int) (0.5 * tileWidth);
   powerups = new ArrayList<Powerup>();
-  powerups.add(new Powerup(new PVector(width / 2, height * 0.65), DOUBLE_JUMP));
+  //powerups.add(new Powerup(new PVector(width / 2, height * 0.65), DOUBLE_JUMP));
   invTimer = 0;
   doubleJTimer = 0;
   trail = new ArrayList<PVector>();
@@ -144,23 +154,6 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   // testing elements
   
-  
-  PVector testBegin = startTile.end.copy().add(0, -tileWidth);
-  PVector testEnd = testBegin.copy().add(tileWidth, 0);
-  //System.out.println(testBegin);
-  //System.out.println(testEnd);
-  //testTile = new LandTile(testBegin, testEnd,  false, 0, false);
-  //terrain.add(testTile);
-  //PVector wat = testEnd.copy().add(0, tileWidth);
-  //terrain.add(new LandTile(wat, wat.copy().add(tileWidth, 0), false, 0, false));
-  //terrain.add(testTile);
-  //LandTile spike = new LandTile(testEnd.copy(), testEnd.copy().add(tileWidth, 0), true, 1, false);
-  //terrain.add(spike);
-  //for (int index = 0; index < 5; index++) {
-  //  LandTile next = spike.copy();
-  //  next.shift(-tileWidth * (index + 1));
-  //  terrain.add(next);
-  //}
   jumpOrbs = new ArrayList<JumpOrb>();
   //jumpOrbs.add(new JumpOrb(new PVector((testTile.start.x + testTile.end.x) / 2, 370)));
   //terrain.add(new LandTile(testBegin.copy().set(testBegin.x, baseElev), testEnd.copy().set(testEnd.x, baseElev), false, 0, false));
@@ -171,6 +164,25 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   if (withMainMenu) newMainMenu();
   
+}
+
+void loadFX() {
+  fx = new SoundFile[4];
+  fx[BUTTON] = new SoundFile(this, "sounds/mixkit-cool-interface-click-tone-2568.wav");
+  fx[START] = new SoundFile(this, "sounds/mixkit-retro-game-notification-212.wav");
+  fx[COIN] = new SoundFile(this, "sounds/mixkit-arcade-game-jump-coin-216.wav");
+  fx[POWERUP] = new SoundFile(this, "sounds/mixkit-winning-a-coin-video-game-2069.wav");
+  fx[DEATH] = new SoundFile(this, "sounds/mixkit-arcade-retro-game-over-213.wav");
+}
+void resetPlaylist() {
+  playlist = new ArrayList<String>();
+  playlist.add("ingame/mixkit-alter-ego-481.mp3");
+  playlist.add("ingame/mixkit-anthem-01-567.mp3");
+  playlist.add("ingame/mixkit-praise-the-lord-262.mp3");
+  playlist.add("ingame/mixkit-rising-forest-471.mp3");
+  playlist.add("ingame/mixkit-swing-is-the-answer-526.mp3");
+  
+  played = new ArrayList<String>();
 }
 
 void drawOrbs() {
@@ -328,7 +340,7 @@ void runButtonTimer() {
 
 void activateButton() {
   for (Button button : buttons)  {
-    if (mousePressed & button.isMouseOnButton()) {
+    if (mousePressed & button.isMouseOnButton()) {      
       String bText = button.getText();
       if (bText.equals("Resume")) 
         resumeGame();
@@ -461,6 +473,13 @@ void drawPowerups() {
   }
 }
 
+void playFX() {
+  while(fx.size() > 0) {
+    SoundFile sound = new SoundFile(this, fx.remove(0));
+    sound.play();
+  }
+}
+
 void draw() {
   //System.out.println((int) Math.random() * 2);
   //System.out.println("p" + p.getCenter());
@@ -492,7 +511,7 @@ void draw() {
   
   if (isInMainMenu || isChoosingDiff) drawTitle();
   if (isChoosingDiff) drawDiffSelect();
-  
+  playFX();
   
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
