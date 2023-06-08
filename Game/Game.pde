@@ -64,6 +64,7 @@ void setup() {
   //for (String font : PFont.list()) println(font);
   fullScreen();
   newGame(true, true);
+  System.out.println(this);
   
   //soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
   //soundfile.play();
