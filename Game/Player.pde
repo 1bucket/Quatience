@@ -69,8 +69,8 @@ class Player {
     return corners;
   }
 
-  public void jump(int boost) { //<>// //<>//
-    //System.out.println(boosted);
+  public void jump(int boost) {  //<>//
+    //fx[JUMP].play();
     if (boost == NORMAL) speedy = 0.4 * tileWidth;
     else if (boost == MINOR) speedy = 14.0 / 30 * tileWidth;
     else if (boost == MAJOR) speedy = 0.6 * tileWidth;

@@ -58,6 +58,7 @@ int rWidth;
 LandTile startTile;
 LandTile testTile;
 
+SoundFile menuTrack;
 SoundFile background;
 SoundFile[] fx;
 final int BUTTON = 0;
@@ -71,7 +72,12 @@ ArrayList<SoundFile> played;
 void setup() {
   //for (String font : PFont.list()) println(font);
   fullScreen();
+  themeColor = color(0, 15, 221);
+  background(red(themeColor), green(themeColor) + 70, blue(themeColor));
+  
   loadFX();
+  loadPlaylist();
+  menuTrack = new SoundFile(this, "soundtracks/menu/mixkit-deep-urban-623.mp3");
   newGame(true, true);
   
   //soundfile = new SoundFile(this, "mixkit-arcade-retro-game-over-213.wav");
@@ -96,7 +102,16 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   //background.loop();
   
   loadFX();
-  resetPlaylist();
+  if (withMainMenu) {
+    menuTrack.loop();
+  }
+  else {
+    fx[START].play();
+    if (menuTrack != null) menuTrack.stop();
+    if (background != null) background.stop();
+    resetPlaylist();
+    beginTrack();
+  }
   
   gameOver = false;
   pause = false;
@@ -113,7 +128,6 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   
   
   //themeColor = color(132, 0, 218);
-  themeColor = color(0, 15, 221);
   lineWeight = 1;
   rWidth = 120;
   
@@ -167,22 +181,41 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
 }
 
 void loadFX() {
-  fx = new SoundFile[4];
+  fx = new SoundFile[5];
   fx[BUTTON] = new SoundFile(this, "sounds/mixkit-cool-interface-click-tone-2568.wav");
   fx[START] = new SoundFile(this, "sounds/mixkit-retro-game-notification-212.wav");
   fx[COIN] = new SoundFile(this, "sounds/mixkit-arcade-game-jump-coin-216.wav");
   fx[POWERUP] = new SoundFile(this, "sounds/mixkit-winning-a-coin-video-game-2069.wav");
   fx[DEATH] = new SoundFile(this, "sounds/mixkit-arcade-retro-game-over-213.wav");
 }
-void resetPlaylist() {
-  playlist = new ArrayList<String>();
-  playlist.add("ingame/mixkit-alter-ego-481.mp3");
-  playlist.add("ingame/mixkit-anthem-01-567.mp3");
-  playlist.add("ingame/mixkit-praise-the-lord-262.mp3");
-  playlist.add("ingame/mixkit-rising-forest-471.mp3");
-  playlist.add("ingame/mixkit-swing-is-the-answer-526.mp3");
+
+void loadPlaylist() {
+  playlist = new ArrayList<SoundFile>();
+  playlist.add(new SoundFile(this, "soundtracks/ingame/mixkit-alter-ego-481.mp3"));
+  playlist.add(new SoundFile(this, "soundtracks/ingame/mixkit-anthem-01-567.mp3"));
+  playlist.add(new SoundFile(this, "soundtracks/ingame/mixkit-praise-the-lord-262.mp3"));
+  playlist.add(new SoundFile(this, "soundtracks/ingame/mixkit-rising-forest-471.mp3"));
+  playlist.add(new SoundFile(this, "soundtracks/ingame/mixkit-swing-is-the-answer-526.mp3"));
   
-  played = new ArrayList<String>();
+  played = new ArrayList<SoundFile>();
+}
+void resetPlaylist() {
+  while (played.size() > 0) {
+    playlist.add(played.remove(0));
+  }
+}
+
+void beginTrack() {
+  background = playlist.remove((int) random(0, playlist.size()));
+  background.play();
+  played.add(background);
+}
+
+void shufflePlay() {
+  if (! background.isPlaying()) {
+    if (playlist.size() == 0) resetPlaylist();
+    beginTrack();
+  }
 }
 
 void drawOrbs() {
@@ -321,7 +354,7 @@ void displayBuffs() {
   PFont font = createFont("ChalkboardSE-Regular", 50);
   textFont(font);
   textAlign(LEFT);
-  fill(pCol);
+  fill(255);
   for (int index = 0; index < buffs.size(); index++) {
     text(buffs.get(index), 10, (index + 1) * 50);
   }
@@ -340,7 +373,8 @@ void runButtonTimer() {
 
 void activateButton() {
   for (Button button : buttons)  {
-    if (mousePressed & button.isMouseOnButton()) {      
+    if (mousePressed & button.isMouseOnButton()) {
+      fx[BUTTON].play();
       String bText = button.getText();
       if (bText.equals("Resume")) 
         resumeGame();
@@ -473,13 +507,6 @@ void drawPowerups() {
   }
 }
 
-void playFX() {
-  while(fx.size() > 0) {
-    SoundFile sound = new SoundFile(this, fx.remove(0));
-    sound.play();
-  }
-}
-
 void draw() {
   //System.out.println((int) Math.random() * 2);
   //System.out.println("p" + p.getCenter());
@@ -489,7 +516,10 @@ void draw() {
   //text(difficulty, width / 2, height / 2);
   
   if (! gameOver && ! pause) {
-    if (! isInMainMenu) score++;
+    if (! isInMainMenu) {
+      score++;
+      shufflePlay();
+    }
     movePlayer();
   }
   if (! isInMainMenu) displayScore();
@@ -511,7 +541,6 @@ void draw() {
   
   if (isInMainMenu || isChoosingDiff) drawTitle();
   if (isChoosingDiff) drawDiffSelect();
-  playFX();
   
   //if (pause) pauseGame();
   //else p.setSpdX(curSpd);
@@ -635,6 +664,7 @@ void checkCollision() {
       if (corner.dist(coins.get(index).getPos()) < coinRadius) {
         score += 500;
         coins.remove(index--);
+        fx[COIN].play();
       }
     }
     
@@ -650,6 +680,7 @@ void checkCollision() {
           doubleJTimer = 30;
         }
         powerups.remove(index--);
+        fx[POWERUP].play();
       }
     }
         
@@ -820,6 +851,8 @@ boolean numInRange(float test, float lowerBound, float upperBound) {
 }
 
 void endGame() {
+  fx[DEATH].play();
+  if (background != null) background.stop();
   gameOver = true;
   p.setSpdX(0);
   //System.out.println("bonk");
@@ -868,8 +901,14 @@ void keyPressed() {
     newGame(false, classicMode);
   }
   if (key == 'q' && ! isInMainMenu && ! gameOver) {
-    if (pause) resumeGame();
-    else pauseGame();
+    if (pause) {
+      resumeGame();
+      background.play();
+    }
+    else {
+      pauseGame();
+      background.pause();
+    }
   }
 }
   
