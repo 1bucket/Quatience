@@ -13,7 +13,6 @@ String splash;
 String[] splashText = new String[] {
     "The game that waits for you to lose!",
     "It's like that dinosaur game but harder",
-    //"Disclaimer: The music is not synced with the course",
     "Play at your own risk!",
     "If you've been playing too long, it might be time for a break",
     "I did not need to try this hard to make this game",
