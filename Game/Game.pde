@@ -41,7 +41,6 @@ boolean canJump;
 ArrayList<PVector> trail;
 color pCol;
 color themeColor;
-int lineWeight;
 int exploSize;
 int opacity;
 
@@ -109,7 +108,6 @@ void newGame(boolean withMainMenu, boolean willBeClassic) {
   classicMode = willBeClassic;
   if (classicMode && ! withMainMenu) surviveTime = 0;
   
-  lineWeight = 1;
   rWidth = 120;
   
   tileWidth = width / 40;
@@ -240,7 +238,7 @@ void drawPlayer() {
 
 void drawTerrain() {
   // modified loop to incorporate changes in elevation
-  strokeWeight(lineWeight);
+  strokeWeight(1);
   for (LandTile tile : terrain) {
     stroke(themeColor);
     

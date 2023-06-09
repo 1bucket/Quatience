@@ -1,4 +1,3 @@
-
 class Chunk {
   boolean willGenCoin;
   
@@ -7,11 +6,12 @@ class Chunk {
     
     int easyChance, medChance;
 
+    willGenCoin = (int) (Math.random() * 100) < 7;
     if (difficulty == EASY) {
       easyChance = 90;
       medChance = 10;
       //hardChance = 0;
-      willGenCoin = (int) (Math.random() * 100) < 7;
+      
       /** variable hardChance is not used but is kept
        and commented out as a reference */
     } else if (difficulty == MEDIUM) {
