@@ -6,7 +6,7 @@ class Chunk {
     
     int easyChance, medChance;
 
-    willGenCoin = (int) (Math.random() * 100) < 7;
+    willGenCoin = (int) (Math.random() * 100) < 20;
     if (difficulty == EASY) {
       easyChance = 90;
       medChance = 10;

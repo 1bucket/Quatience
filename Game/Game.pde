@@ -594,7 +594,7 @@ void movePlayer() {
     else {
       gen.genChunk();
     }
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.1) {
       gen.genPowerup((int) random(0, 2));
     }
   }
