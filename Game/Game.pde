@@ -395,7 +395,7 @@ void drawTitle() {
   textSize(100);
   textAlign(CENTER);
   
-  text("Geometry Dash Infinite", width / 2, height * 2 / 5);
+  text("Quatience", width / 2, height * 2 / 5);
   
   textSize(5 * abs(sin(PI / 45 * frameCount)) + 30);
   text(splash, width / 2, height * 0.5);
